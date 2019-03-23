@@ -30,9 +30,9 @@ permalink: /:year/:month/:day/:title/
 social_media:
   linkedin: dayanruben
   twitter: dayanruben
-  facebook: dayanruben
-  behance: dayanruben
-  dribbble: dayanruben
+  # facebook: dayanruben
+  # behance: dayanruben
+  # dribbble: dayanruben
   stackoverflow: 1195066
   youtube: DayanRubenGonzalezBasabe
   # medium: @dayanruben
