@@ -16,26 +16,26 @@ permalink: /:year/:month/:day/:title/
 #     values:
 #       layout: "post"
 
-# projects:
-#   sort_by: pushed
-#   # sort_by options:
-#   #   - pushed
-#   #   - stars
-#   limit: 9
-#   exclude:
-#     forks: true
-#     projects:
-#     # - repo-name
+projects:
+  sort_by: pushed
+  # sort_by options:
+  #   - pushed
+  #   - stars
+  limit: 0
+  exclude:
+    forks: true
+    projects:
+    # - repo-name
 
 social_media:
   linkedin: dayanruben
   twitter: dayanruben
-  # keybase: dayanruben
+  keybase: dayanruben
   # facebook: dayanruben
   # behance: dayanruben
   # dribbble: dayanruben
-  stackoverflow: 1195066
-  youtube: DayanRubenGonzalezBasabe
+  # stackoverflow: 1195066
+  # youtube: DayanRubenGonzalezBasabe
   # medium: @dayanruben
   # telegram: your_username
   # vk: your_username
