@@ -27,18 +27,22 @@ projects:
     projects:
     # - repo-name
 
-social_media:
-  linkedin: dayanruben
-  twitter: dayanruben
+# social_media:
+  # behance: your_username
+  # dribbble: your_username
+  # facebook: your_username
+  # hackerrank: your_username
+  # instagram: your_username
   keybase: dayanruben
-  # facebook: dayanruben
-  # behance: dayanruben
-  # dribbble: dayanruben
-  # stackoverflow: 1195066
-  # youtube: DayanRubenGonzalezBasabe
-  # medium: @dayanruben
+  linkedin: dayanruben
+  # medium: your_username
+  stackoverflow: 1195066
   # telegram: your_username
+  twitter: dayanruben
+  # unsplash: your_username
   # vk: your_username
+  website: https://dayan.dev
+  # youtube: your_username
 
 # topics:
 #   - name: CSS
