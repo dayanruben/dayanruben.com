@@ -27,7 +27,7 @@ projects:
     projects:
     # - repo-name
 
-# social_media:
+social_media:
   # behance: your_username
   # dribbble: your_username
   # facebook: your_username
@@ -36,12 +36,12 @@ projects:
   keybase: dayanruben
   linkedin: dayanruben
   # medium: your_username
-  stackoverflow: 1195066
+  # stackoverflow: 1195066
   # telegram: your_username
   twitter: dayanruben
   # unsplash: your_username
   # vk: your_username
-  website: https://dayan.dev
+  # website: https://dayan.dev
   # youtube: your_username
 
 # topics:
