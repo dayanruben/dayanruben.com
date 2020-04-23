@@ -23,6 +23,7 @@ projects:
   #   - stars
   limit: 0
   exclude:
+    archived: false
     forks: true
     projects:
     # - repo-name
@@ -35,6 +36,7 @@ social_media:
   # instagram: your_username
   keybase: dayanruben
   linkedin: dayanruben
+  # mastodon: your_username
   # medium: your_username
   # stackoverflow: 1195066
   # telegram: your_username
