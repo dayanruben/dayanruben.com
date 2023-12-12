@@ -134,6 +134,7 @@ social_media:
   vk: your_username
   website: http://your_website_url
   youtube: your_username
+  threads: your_username
 ```
 
 Links to your profile for each of the services you define will appear in the `<header>` of your website, appended to your bio. And if those services support sharing, any blog posts that you publish will include links to share that post using each social media service.
