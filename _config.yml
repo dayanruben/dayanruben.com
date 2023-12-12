@@ -1,5 +1,5 @@
 layout: stacked
-style: dark
+style: light
 
 plugins: 
   - jekyll-octicons
@@ -34,18 +34,18 @@ social_media:
   # facebook: your_username
   # hackerrank: your_username
   # instagram: your_username
-  keybase: dayanruben
-  linkedin: dayanruben
-  mastodon: dayanruben
-  threads: dayanruben
   # medium: your_username
   # stackoverflow: 1195066
   # telegram: your_username
-  twitter: dayanruben
   # unsplash: your_username
   # vk: your_username
   # website: https://dayanruben.com
   # youtube: your_username
+  keybase: dayanruben
+  linkedin: dayanruben
+  mastodon: dayanruben
+  threads: dayanruben
+  twitter: dayanruben
 
 # topics:
 #   - name: CSS
