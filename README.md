@@ -112,7 +112,7 @@ Your website comes pre-configured with three topics (e.g. "Web design" and "Sass
 
 #### Social media
 
-Your website supports linking and sharing to social media services you're using, including Behance, Dribbble, Facebook, LinkedIn, Medium, Stack Overflow, Twitter, and YouTube. To identify the services you use:
+Your website supports linking and sharing to social media services you're using, including Behance, Dribbble, Facebook, LinkedIn, Medium, Stack Overflow, X, and YouTube. To identify the services you use:
 
 1. Edit your repository's `_config.yml` file.
 2. Edit the `social_media` dictionary line, and represent the services you like in a simple `key: value` form:
@@ -129,7 +129,7 @@ social_media:
   medium: your_username
   stackoverflow: your_user_id
   telegram: your_username
-  twitter: your_username
+  x: your_username
   unsplash: your_username
   vk: your_username
   website: http://your_website_url
