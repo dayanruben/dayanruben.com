@@ -1,7 +1,7 @@
 layout: stacked
 style: light
 
-plugins: 
+plugins:
   - jekyll-octicons
   - jekyll-github-metadata
   - jemoji
@@ -16,19 +16,19 @@ permalink: /:year/:month/:day/:title/
 #     values:
 #       layout: "post"
 
-projects: 
+projects:
   sort_by: pushed
   # sort_by options:
   #   - pushed
   #   - stars
   limit: 0
-  exclude: 
+  exclude:
     archived: false
     forks: true
     projects:
     # - repo-name
 
-social_media: 
+social_media:
   # behance: your_username
   # dribbble: your_username
   # facebook: your_username
