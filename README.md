@@ -212,10 +212,11 @@ Jekyll's convention for defining layouts is very flexible. You can [learn more a
 
 ## Styles
 
-Your website is pre-configured to use [GitHub's very flexible CSS framework called "Primer,"](https://styleguide.github.com/primer/). It's currently referenced within your `styles.scss` file, using the CSS import at-rule:
+Your website is pre-configured to use [GitHub's very flexible CSS framework called "Primer,"](https://styleguide.github.com/primer/). The bundled stylesheet is served locally from `assets/vendor/primer.css`, and the site's custom overrides live in `assets/styles.scss`:
 
 ```
-@import url('https://unpkg.com/primer/build/build.css');
+<link href="{{ "/assets/vendor/primer.css" | relative_url }}" rel="stylesheet" type="text/css">
+<link href="{{ "/assets/styles.css" | relative_url }}" rel="stylesheet" type="text/css">
 ```
 
 You are, of course, welcome to remove it or replace it with another framework. Just bear in mind that the HTML that your website came pre-packaged with references multiple Primer "utility classes" to define things like column widths, margins, and background colors.
