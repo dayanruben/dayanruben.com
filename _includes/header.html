@@ -1,8 +1,7 @@
-{% if site.style == 'dark' %}
-  {% assign icon_color = "#ffffff" %}
-{% else %}
-  {% assign icon_color = "#24292e" %}
-{% endif %}
+{% assign default_theme = site.style | default: 'system' %}
+{% unless default_theme == 'light' or default_theme == 'dark' or default_theme == 'system' %}
+  {% assign default_theme = 'system' %}
+{% endunless %}
 
 {% assign posts_total = site.posts | size %}
 
@@ -17,10 +16,12 @@
 {% endif %}
 
 <!doctype html>
-<html class="min-height-full" lang="en">
+<html class="min-height-full" lang="en" data-theme-default="{{ default_theme }}" data-theme="{{ default_theme }}">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'none'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="color-scheme" content="light dark">
+    <script src="{{ "/assets/theme.js" | relative_url }}"></script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{{ page_title }}</title>
     <meta name="description" content="{{ meta_description }}" />
@@ -31,4 +32,5 @@
     <link href="{{ "/assets/vendor/primer.css" | relative_url }}" rel="stylesheet" type="text/css">
     <link href="{{ "/assets/styles.css" | relative_url }}" rel="stylesheet" type="text/css">
   </head>
-  <body class="bg-white min-height-full" {% if site.style == 'dark' %}style="background-color: #2f363d !important"{% endif %}>
+  <body class="min-height-full">
+    {% include theme-switcher.html %}

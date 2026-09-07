@@ -5,8 +5,8 @@
 {% endif %}
 
 <img src="{{ user.avatar_url }}" alt="{{ user.name }}" class="circle mb-3" style="width: 150px; height: 150px; max-width: 150px;">
-<h1 class="{% if site.style == 'dark' %}text-white{% endif %} mb-2 lh-condensed">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
-<p class="mb-3 f4 {% if site.style == 'dark' %}text-white{% else %}text-gray{% endif %}">
+<h1 class="mb-2 lh-condensed">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
+<p class="mb-3 f4 theme-muted">
   {{ user.bio }}
 </p>
 
@@ -14,23 +14,23 @@
   <div class="f4 mb-6">
     {% if user.name %}
       <div class="{{ metadata_styles }}">
-        {% octicon mark-github height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:GitHub %}
-        <a href="https://github.com/{{ user.login }}" {% if site.style == 'dark' %}class="text-white"{% endif %}>
+        {% octicon mark-github height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:GitHub %}
+        <a href="https://github.com/{{ user.login }}">
           @{{ user.login }}
         </a>
       </div>
     {% endif %}
     {% if user.email %}
       <div class="{{ metadata_styles }}">
-        {% octicon mail height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:email %}
-        <a href="mailto:{{ user.email }}" {% if site.style == 'dark' %}class="text-white"{% endif %}>
+        {% octicon mail height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:email %}
+        <a href="mailto:{{ user.email }}">
           {{ user.email }}
         </a>
       </div>
     {% endif %}
     {% if user.location %}
-      <div class="{{ metadata_styles }} {% if site.style == 'dark' %}text-white{% endif %}">
-        {% octicon location height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:Location %}
+      <div class="{{ metadata_styles }}">
+        {% octicon location height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:Location %}
         {{ user.location }}
       </div>
     {% endif %}
@@ -40,7 +40,7 @@
           <div class="{% unless forloop.last == true %}mr-3{% endunless %} mb-3">
             {% assign service_shortname = account[0] %}
             {% assign service = site.data.social_media[service_shortname] %}
-            <a href="{{ service.profile_url_prefix }}{{ account[1] }}" class="tooltipped tooltipped-se" {{ service.relme }} aria-label="{{ service.name }}: {{ account[1] }}">
+            <a href="{{ service.profile_url_prefix }}{{ account[1] }}" class="social-link tooltipped tooltipped-se" {{ service.relme }} aria-label="{{ service.name }}: {{ account[1] }}">
               {{ service.icon_svg }}<span class="d-none">{{ service.name }}</span>
             </a>
           </div>
@@ -48,7 +48,7 @@
       </div>
     {% endif %}
     {% if user.hireable %}
-      <span title="Hire me" class="d-inline-block f5 rounded-2 text-white bg-green py-1 px-2">Available for hire</span>
+      <span title="Hire me" class="d-inline-block f5 rounded-2 theme-success py-1 px-2">Available for hire</span>
     {% endif %}
   </div>
 {% endif %}

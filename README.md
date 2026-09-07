@@ -89,7 +89,11 @@ Your website will display in a two-column layout by default on larger-screen dev
 
 #### Style
 
-Your website appears with a "light" white and gray background by default, with dark text. You can quickly switch to a "dark" background with white text by changing the line in your `_config.yml` file that reads `style: light` to `style: dark`.
+The website follows the visitor's browser or system color preference by default (`style: system` in `_config.yml`). The Theme button offers System, Light, and Dark on every layout. Light and Dark apply immediately and are remembered in this browser across pages, visits, and tabs. Selecting System restores automatic updates when the browser or operating system changes its theme.
+
+The existing `style: light` and `style: dark` settings remain supported as defaults for visitors without a saved choice. An explicit visitor selection takes precedence. If browser storage is unavailable, switching still works for the current page. Without JavaScript, CSS applies the configured default (including automatic System colors), and the manual control stays hidden.
+
+Theme colors live in `assets/styles.scss`; monochrome SVG icons use `currentColor`, and two-tone icon details use `--color-icon-cutout`. The small, same-origin `assets/theme.js` script runs before the stylesheets to restore a saved choice before the page paints. Keep the shared Content Security Policy compatible with `script-src 'self'`; inline and third-party scripts are not needed.
 
 #### Projects
 
