@@ -4,10 +4,10 @@
   {% assign metadata_styles = 'd-flex flex-items-center mb-3' %}
 {% endif %}
 
-<img src="{{ user.avatar_url }}" alt="{{ user.name }}" class="circle mb-3" style="width: 150px; height: 150px; max-width: 150px;">
-<h1 class="mb-2 lh-condensed">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
+<img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle mb-3" style="width: 150px; height: 150px; max-width: 150px;">
+<h1 class="mb-2 lh-condensed">{% if user.name %}{{ user.name | escape }}{% else %}{{ user.login | escape }}{% endif %}</h1>
 <p class="mb-3 f4 theme-muted">
-  {{ user.bio }}
+  {{ user.bio | escape }}
 </p>
 
 {% if include.metadata %}
@@ -15,23 +15,23 @@
     {% if user.name %}
       <div class="{{ metadata_styles }}">
         {% octicon mark-github height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:GitHub %}
-        <a href="https://github.com/{{ user.login }}">
-          @{{ user.login }}
+        <a href="https://github.com/{{ user.login | escape }}">
+          @{{ user.login | escape }}
         </a>
       </div>
     {% endif %}
     {% if user.email %}
       <div class="{{ metadata_styles }}">
         {% octicon mail height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:email %}
-        <a href="mailto:{{ user.email }}">
-          {{ user.email }}
+        <a href="mailto:{{ user.email | escape }}">
+          {{ user.email | escape }}
         </a>
       </div>
     {% endif %}
     {% if user.location %}
       <div class="{{ metadata_styles }}">
         {% octicon location height:20 class:"mr-2 v-align-middle" fill:currentColor aria-label:Location %}
-        {{ user.location }}
+        {{ user.location | escape }}
       </div>
     {% endif %}
     {% if site.social_media %}

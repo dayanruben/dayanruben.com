@@ -14,6 +14,17 @@ const output = join(temporary, 'site');
 const artifacts = resolve(process.env.THEME_ARTIFACTS || join(tmpdir(), 'website-theme-validation'));
 mkdirSync(source); mkdirSync(output); mkdirSync(artifacts, { recursive: true });
 const reports = [];
+const metadataText = 'Profile "<b data-metadata>text</b> & friends';
+const metadataOwner = {
+  name: metadataText, login: metadataText, bio: metadataText,
+  location: metadataText, email: `${metadataText}@example.test`,
+  avatar_url: '/favicon.ico?label="avatar"&version=1',
+};
+const metadataRepository = {
+  name: metadataText, description: metadataText, language: 'JavaScript',
+  html_url: 'https://example.test/?label="repository"&version=1',
+  stargazers_count: 7, forks_count: 2,
+};
 let server;
 try {
   for (const path of ['_config.yml', '_data', '_includes', '_layouts', '_sass', 'assets', 'index.html', 'favicon.ico', 'package.json']) {
@@ -25,11 +36,14 @@ try {
   mkdirSync(join(source, '_posts'));
   writeFileSync(join(source, '_posts/2026-01-01-example.md'), '---\nlayout: post\ntitle: Example article\npermalink: /article/\n---\nA paragraph with [a link](#example), **bold text**, and `inline code`.\n\n> A readable quotation.\n\n## Example\n\n```ruby\n# A comment\nputs "Hello"\n```\n');
   const fixture = readFileSync(join(root, 'tests/fixtures/config.yml'), 'utf8');
-  const variants = { stacked: ['stacked', 'system'], sidebar: ['sidebar', 'system'], light: ['stacked', 'light'], dark: ['stacked', 'dark'] };
+  const metadataConfig = join(temporary, 'metadata-values.yml');
+  writeFileSync(metadataConfig, JSON.stringify({ github: { owner: metadataOwner, public_repositories: [metadataRepository] } }));
+  const variants = { stacked: ['stacked', 'system'], sidebar: ['sidebar', 'system'], light: ['stacked', 'light'], dark: ['stacked', 'dark'], metadata: ['sidebar', 'system'] };
   for (const [name, [layout, theme]] of Object.entries(variants)) {
     const config = join(temporary, `${name}.yml`);
     writeFileSync(config, `${fixture}\nlayout: ${layout}\nstyle: ${theme}\nbaseurl: /${name}\n`);
-    const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', join(output, name), '--config', `${join(source, '_config.yml')},${config}`], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
+    const configs = `${join(source, '_config.yml')},${config}${name === 'metadata' ? `,${metadataConfig}` : ''}`;
+    const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', join(output, name), '--config', configs], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
     assert.equal(result.status, 0, `Jekyll ${name}: ${result.stderr}\n${result.stdout}`);
     assert.ok(!existsSync(join(output, name, 'tests')), 'Validation tools must not be published');
     assert.ok(!existsSync(join(output, name, 'package.json')), 'Node tooling must not be published');
@@ -91,6 +105,35 @@ try {
   for (const [browserName, browserType] of Object.entries({ chromium, firefox, webkit })) {
     const browser = await browserType.launch();
     try {
+      // API metadata is plain text even when it contains HTML or attribute quotes.
+      const metadataContext = await browser.newContext({ ignoreHTTPSErrors: true });
+      try {
+        const page = await metadataContext.newPage();
+        await page.goto(`${origin}/metadata/preview.html`);
+        for (const theme of ['light', 'dark']) {
+          await choose(page, theme); await appearance(page, theme);
+          assert.equal(await page.locator('[data-metadata]').count(), 0, 'Metadata must not create HTML elements or attributes');
+          assert.equal(await page.title(), metadataText);
+          assert.equal(await page.locator('meta[property="og:title"]').getAttribute('content'), metadataText);
+          assert.equal(await page.locator('meta[name="description"]').getAttribute('content'), 'Profile "text & friends');
+          assert.equal(await page.locator('meta[property="og:image"]').getAttribute('content'), metadataOwner.avatar_url);
+          assert.equal(await page.locator('img.circle').getAttribute('alt'), metadataText);
+          assert.equal(await page.locator('img.circle').getAttribute('src'), metadataOwner.avatar_url);
+          assert.equal((await page.locator('h1').first().textContent()).trim(), metadataText);
+          assert.equal((await page.locator('p.mb-3').textContent()).trim(), metadataText);
+          assert.equal(await page.locator('a[href^="mailto:"]').getAttribute('href'), `mailto:${metadataOwner.email}`);
+          assert.equal((await page.locator('a[href^="mailto:"]').textContent()).trim(), metadataOwner.email);
+          assert.equal((await page.locator('.octicon-location').locator('..').textContent()).trim(), metadataText);
+          assert.equal(await page.locator('a[href^="https://github.com/"]').first().getAttribute('href'), `https://github.com/${metadataOwner.login}`);
+          const card = page.locator('.github-component').filter({ has: page.locator('.octicon-repo') });
+          assert.equal((await card.locator('h1').textContent()).trim(), metadataText);
+          assert.equal(await card.locator('.ws-normal').textContent(), metadataText);
+          assert.equal(await card.locator('a').first().getAttribute('href'), metadataRepository.html_url);
+          assert.equal(await card.locator('a').nth(1).getAttribute('href'), `${metadataRepository.html_url}/stargazers`);
+          assert.equal(await card.locator('a').nth(2).getAttribute('href'), `${metadataRepository.html_url}/network/members`);
+        }
+      } finally { await metadataContext.close(); }
+      console.log(`PASS ${browserName}: metadata stays literal in both themes`);
       for (const layout of ['stacked', 'sidebar']) {
         const context = await browser.newContext({ ignoreHTTPSErrors: true, colorScheme: 'light', viewport: { width: 1280, height: 900 } });
         const page = await context.newPage();

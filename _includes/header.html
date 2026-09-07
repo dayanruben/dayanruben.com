@@ -9,10 +9,10 @@
 
 {% if page.path contains '_posts' %}
   {% assign page_title = page.title %}
-  {% assign meta_description = page.content | strip_html | strip_newlines | xml_escape | truncate: 300 %}
+  {% assign meta_description = page.content | strip_html | strip_newlines | truncate: 300 | xml_escape %}
 {% else %}
   {% assign page_title = user.name %}
-  {% assign meta_description = user.bio | strip_html | strip_newlines | xml_escape | truncate: 300 %}
+  {% assign meta_description = user.bio | strip_html | strip_newlines | truncate: 300 | xml_escape %}
 {% endif %}
 
 <!doctype html>
@@ -23,10 +23,10 @@
     <meta name="color-scheme" content="light dark">
     <script src="{{ "/assets/theme.js" | relative_url }}"></script>
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>{{ page_title }}</title>
+    <title>{{ page_title | escape }}</title>
     <meta name="description" content="{{ meta_description }}" />
-    <meta property="og:title" content="{{ user.name }}" />
-    <meta property="og:image" content="{{ user.avatar_url }}" />
+    <meta property="og:title" content="{{ user.name | escape }}" />
+    <meta property="og:image" content="{{ user.avatar_url | escape }}" />
     <meta property="og:description" content="{{ meta_description }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="{{ "/assets/vendor/primer.css" | relative_url }}" rel="stylesheet" type="text/css">
