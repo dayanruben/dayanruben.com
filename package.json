@@ -1,0 +1,11 @@
+{
+  "name": "dayanruben-website-checks",
+  "private": true,
+  "scripts": {
+    "test": "node tests/themes.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.13.0",
+    "playwright": "1.63.0"
+  }
+}

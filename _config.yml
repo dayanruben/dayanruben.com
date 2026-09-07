@@ -61,3 +61,6 @@ social_media:
 #     image_url: https://raw.githubusercontent.com/github/explore/6c6508f34230f0ac0d49e847a326429eefbfc030/topics/sass/sass.png
 
 include: [".well-known"]
+
+# Local/CI validation tools are not published by GitHub Pages.
+exclude: ["tests", "node_modules", "package.json", "package-lock.json"]

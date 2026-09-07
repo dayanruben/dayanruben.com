@@ -1,0 +1,35 @@
+repository: dayanruben/dayanruben.com
+url: http://localhost
+baseurl: ""
+title: Theme validation
+description: Local theme validation fixtures
+github:
+  owner:
+    name: Dayan Ruben
+    login: dayanruben
+    bio: Software engineer
+    location: Brazil
+    email: hello@example.test
+    avatar_url: /favicon.ico
+    hireable: true
+  public_repositories:
+    - name: Theme example
+      html_url: https://github.com/dayanruben/dayanruben.com
+      description: Example project description
+      language: JavaScript
+      stargazers_count: 7
+      forks_count: 2
+      fork: false
+      archived: false
+      pushed_at: 2026-01-01
+  is_project_page: false
+  is_user_page: true
+  repository_name: dayanruben.com
+topics:
+  - name: Accessibility
+    web_url: https://example.test/
+    description: Readable and usable in either theme
+# Use deterministic metadata above; production still uses jekyll-github-metadata.
+plugins:
+  - jekyll-octicons
+  - jemoji

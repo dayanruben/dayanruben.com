@@ -1,0 +1,30 @@
+---
+layout: default
+title: Theme preview
+permalink: /preview.html
+---
+<div class="article">
+  <h2>Readable in either theme</h2>
+  <p>Body text with <a href="#details">a link</a>, <strong>bold text</strong>, and <code>inline code</code>.</p>
+  <p class="theme-muted">Secondary text should remain comfortable to read.</p>
+  <blockquote>Quoted text and borders follow the selected appearance.</blockquote>
+  <table><thead><tr><th>Theme</th><th>Preference</th></tr></thead><tbody><tr><td>System</td><td>Automatic</td></tr><tr><td>Light or Dark</td><td>Saved</td></tr></tbody></table>
+  {% highlight javascript %}
+// A readable comment
+const greeting = "Hello";
+function theme(count = 42) { return greeting + count; }
+  {% endhighlight %}
+  <h2 id="details">Shared components</h2>
+  {% assign repository = site.github.public_repositories[0] %}
+  {% include repo-card.html %}
+  {% assign topic = site.topics[0] %}
+  {% include topic-card.html %}
+  {% assign post = site.posts[0] %}
+  {% include post-card.html %}
+  <h2>All social icons</h2>
+  <div class="d-flex flex-wrap" style="gap: 16px;">
+    {% for item in site.data.social_media %}
+      <a class="social-link" href="#details" aria-label="{{ item[1].name }}">{{ item[1].icon_svg }}</a>
+    {% endfor %}
+  </div>
+</div>
