@@ -89,7 +89,7 @@ Your website will display in a two-column layout by default on larger-screen dev
 
 #### Style
 
-The website follows the visitor's browser or system color preference by default (`style: system` in `_config.yml`). The Theme button offers System, Light, and Dark on every layout. Light and Dark apply immediately and are remembered in this browser across pages, visits, and tabs. Selecting System restores automatic updates when the browser or operating system changes its theme.
+The website follows the visitor's browser or system color preference by default (`style: system` in `_config.yml`). A compact theme icon beside the profile name switches between Light, Dark, and System, and the selected preference is remembered in this browser across pages, visits, and tabs.
 
 The existing `style: light` and `style: dark` settings remain supported as defaults for visitors without a saved choice. An explicit visitor selection takes precedence. If browser storage is unavailable, switching still works for the current page. Without JavaScript, CSS applies the configured default (including automatic System colors), and the manual control stays hidden.
 

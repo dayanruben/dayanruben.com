@@ -5,7 +5,10 @@
 {% endif %}
 
 <img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle mb-3" style="width: 150px; height: 150px; max-width: 150px;">
-<h1 class="mb-2 lh-condensed">{% if user.name %}{{ user.name | escape }}{% else %}{{ user.login | escape }}{% endif %}</h1>
+<div class="profile-heading {% if site.layout == 'stacked' %}flex-justify-center{% endif %}">
+  <h1 class="lh-condensed">{% if user.name %}{{ user.name | escape }}{% else %}{{ user.login | escape }}{% endif %}</h1>
+  {% include theme-switcher.html %}
+</div>
 <p class="mb-3 f4 theme-muted">
   {{ user.bio | escape }}
 </p>

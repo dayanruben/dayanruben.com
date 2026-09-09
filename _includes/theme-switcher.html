@@ -1,15 +1,9 @@
-<div class="theme-toolbar">
-  <div class="theme-switcher" hidden>
-    <button class="theme-toggle" id="theme-toggle" type="button" aria-expanded="false" aria-controls="theme-options">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 1.5a6.5 6.5 0 0 1 0 13Z"/></svg>
-      <span>Theme: <span id="theme-label">System</span></span>
-      <span aria-hidden="true">▾</span>
-    </button>
-    <fieldset class="theme-options" id="theme-options" hidden>
-      <legend class="sr-only">Color theme</legend>
-      <label><input type="radio" name="theme" value="system"> System</label>
-      <label><input type="radio" name="theme" value="light"> Light</label>
-      <label><input type="radio" name="theme" value="dark"> Dark</label>
-    </fieldset>
-  </div>
+<div class="theme-switcher" hidden>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme">
+    <svg class="theme-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path class="theme-icon-light" fill="currentColor" d="M12 2.5a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1Zm0 16a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1ZM3.5 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1Zm18 0a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1ZM5.64 4.22a1 1 0 0 1 1.42 0l.7.7a1 1 0 0 1-1.42 1.42l-.7-.7a1 1 0 0 1 0-1.42Zm12.6 12.6a1 1 0 0 1 1.42 0l.7.7a1 1 0 0 1-1.42 1.42l-.7-.7a1 1 0 0 1 0-1.42ZM18.36 4.22a1 1 0 0 1 0 1.42l-.7.7a1 1 0 0 1-1.42-1.42l.7-.7a1 1 0 0 1 1.42 0ZM5.76 16.82a1 1 0 0 1 0 1.42l-.7.7a1 1 0 0 1-1.42-1.42l.7-.7a1 1 0 0 1 1.42 0ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/>
+      <path class="theme-icon-dark" fill="currentColor" d="M20.7 15.3a8.5 8.5 0 0 1-11.99-12A8.5 8.5 0 1 0 20.7 15.3Z"/>
+    </svg>
+    <span class="sr-only" id="theme-label">System theme</span>
+  </button>
 </div>

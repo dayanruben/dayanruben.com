@@ -83,23 +83,24 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .social-link { color: var(--color-text); }
 .social-link svg { vertical-align: middle; }
 
-.theme-toolbar {
+.profile-heading {
   display: flex;
-  justify-content: flex-end;
-  height: 60px;
-  max-width: 1012px;
-  margin: 0 auto;
-  padding: 16px 16px 0;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
+.profile-heading h1 { margin-bottom: 0; }
 .theme-switcher { position: relative; z-index: 10; }
 .theme-toggle {
   display: flex;
+  flex: 0 0 44px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 158px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
   min-height: 44px;
-  padding: 8px 12px;
+  padding: 0;
   border: 1px solid var(--color-control-border);
   border-radius: 6px;
   background: var(--color-surface);
@@ -107,34 +108,20 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   font: inherit;
   cursor: pointer;
 }
-.theme-toggle:hover, .theme-toggle[aria-expanded='true'] {
+.theme-toggle:hover {
   background: var(--color-canvas-muted);
 }
-.theme-options {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 180px;
-  margin: 0;
-  padding: 8px;
-  border: 1px solid var(--color-control-border);
-  border-radius: 6px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  text-align: left;
+.theme-icon-light, .theme-icon-dark { display: none; }
+.theme-toggle[data-effective-theme='light'] .theme-icon-light,
+.theme-toggle[data-effective-theme='dark'] .theme-icon-dark { display: block; }
+@media (prefers-color-scheme: light) {
+  .theme-toggle[data-preference='system'] .theme-icon-light { display: block; }
+  .theme-toggle[data-preference='system'] .theme-icon-dark { display: none; }
 }
-.theme-options label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 8px;
-  border-radius: 3px;
-  font-weight: normal;
-  cursor: pointer;
+@media (prefers-color-scheme: dark) {
+  .theme-toggle[data-preference='system'] .theme-icon-light { display: none; }
+  .theme-toggle[data-preference='system'] .theme-icon-dark { display: block; }
 }
-.theme-options label:hover { background: var(--color-canvas-muted); }
-.theme-options input { margin: 0; accent-color: var(--color-link); }
 [hidden] { display: none !important; }
 
 // Keep custom fonts from bleeding into GitHub components.
@@ -169,7 +156,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   hr { background: var(--color-border); border-color: var(--color-border); }
 }
 .min-height-full { min-height: 100vh; }
-.theme-toolbar + .min-height-full { min-height: calc(100vh - 60px); }
 
 @import 'highlight-syntax';
 figure.highlight { margin-left: 0; margin-right: 0; }

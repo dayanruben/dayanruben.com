@@ -47,7 +47,9 @@ try {
     assert.equal(result.status, 0, `Jekyll ${name}: ${result.stderr}\n${result.stdout}`);
     assert.ok(!existsSync(join(output, name, 'tests')), 'Validation tools must not be published');
     assert.ok(!existsSync(join(output, name, 'package.json')), 'Node tooling must not be published');
-    assert.ok(readFileSync(join(output, name, 'index.html'), 'utf8').includes('theme-toggle'), `Rendered theme control: ${result.stdout} ${result.stderr}`);
+    const rendered = readFileSync(join(output, name, 'index.html'), 'utf8');
+    assert.ok(rendered.includes('theme-toggle'), `Rendered theme control: ${result.stdout} ${result.stderr}`);
+    assert.ok(!rendered.includes('theme-options'), 'The compact control must not render a theme menu');
     console.log(`PASS Jekyll build: ${name}`);
   }
   const types = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.ico': 'image/x-icon' };
@@ -73,11 +75,14 @@ try {
     assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme), theme);
   }
   async function choose(page, value) {
-    if (await page.locator('#theme-options').isHidden()) await page.locator('#theme-toggle').click();
-    await page.locator(`input[value="${value}"]`).check();
-    assert.equal(await page.locator('#theme-label').textContent(), value[0].toUpperCase() + value.slice(1));
-    await page.keyboard.press('Escape');
-    assert.equal(await page.locator('#theme-toggle').getAttribute('aria-expanded'), 'false');
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      if (await page.evaluate(theme => document.documentElement.getAttribute('data-theme') === theme, value)) break;
+      await page.locator('#theme-toggle').click();
+    }
+    assert.equal(await page.evaluate(() => document.documentElement.getAttribute('data-theme')), value);
+    assert.equal(await page.locator('#theme-toggle').getAttribute('data-effective-theme'), value === 'system' ? await page.evaluate(() => matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : value);
+    assert.equal(await page.locator('#theme-label').textContent(), value === 'system' ? 'System theme' : value[0].toUpperCase() + value.slice(1) + ' theme');
+    assert.equal(await page.locator('.theme-toggle svg path:visible').count(), 1, 'Show one icon for the effective theme');
   }
   async function inspectColors(page) {
     return page.evaluate(() => {
@@ -184,31 +189,30 @@ try {
         await choose(page, 'light'); await appearance(other, 'light');
         await page.emulateMedia({ colorScheme: 'dark' }); await appearance(page, 'light');
         await choose(page, 'system'); await appearance(page, 'dark');
+        assert.equal(await page.locator('#theme-toggle').getAttribute('data-effective-theme'), 'dark');
+        assert.equal(await page.locator('.theme-icon-dark:visible').count(), 1);
         assert.equal(await page.evaluate(() => localStorage.getItem('dayanruben-theme')), null);
         await page.emulateMedia({ colorScheme: 'light' }); await appearance(page, 'light');
+        assert.equal(await page.locator('.theme-icon-light:visible').count(), 1);
         await page.evaluate(() => localStorage.setItem('dayanruben-theme', 'invalid'));
         await page.reload(); await appearance(page, 'light');
-        assert.equal(await page.locator('#theme-label').textContent(), 'System');
-        // Keyboard: open, arrow between native radios, escape and restore focus.
+        assert.equal(await page.locator('#theme-label').textContent(), 'System theme');
+        // Keyboard activation follows the same compact icon cycle as a pointer click.
         await page.locator('#theme-toggle').focus(); await page.keyboard.press('Enter');
-        assert.equal(await page.locator('input[value="system"]').evaluate(el => el === document.activeElement), true);
-        await page.keyboard.press('ArrowDown'); await appearance(page, 'light');
-        await page.keyboard.press('ArrowDown'); await appearance(page, 'dark');
-        await page.keyboard.press('Escape');
+        await appearance(page, 'dark');
+        assert.equal(await page.locator('#theme-toggle').getAttribute('aria-label'), 'Switch to light theme');
+        await page.keyboard.press('Space'); await appearance(page, 'light');
+        assert.equal(await page.locator('#theme-toggle').getAttribute('aria-label'), 'Follow system theme');
+        await page.keyboard.press('Enter'); await appearance(page, 'light');
         assert.equal(await page.locator('#theme-toggle').evaluate(el => el === document.activeElement), true);
         assert.notEqual(await page.locator('#theme-toggle').evaluate(el => getComputedStyle(el).outlineStyle), 'none');
-        await page.locator('#theme-toggle').click(); await page.keyboard.press('Tab');
-        await page.locator('#theme-options').waitFor({ state: 'hidden' });
-        await page.locator('#theme-toggle').click(); await page.locator('h1').first().click();
-        assert.equal(await page.locator('#theme-options').isHidden(), true);
-        // Mobile wrapping, touch targets, and open control contrast in both themes.
+        // Mobile wrapping, touch targets, and icon contrast in both themes.
         await page.setViewportSize({ width: 320, height: 740 });
         await page.evaluate(axe.source);
         for (const theme of ['light', 'dark']) {
           await choose(page, theme);
-          await page.locator('#theme-toggle').click();
           const button = await page.locator('#theme-toggle').boundingBox();
-          assert.ok(button.width >= 44 && button.height >= 44);
+          assert.ok(Math.round(button.width) >= 44 && Math.round(button.height) >= 44, `Theme control target: ${JSON.stringify(button)}`);
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'No horizontal overflow');
           const violations = await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })).violations);
           assert.deepEqual(violations, [], 'Mobile control accessibility');
