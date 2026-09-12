@@ -90,7 +90,20 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   margin-bottom: 8px;
 }
 .profile-heading h1 { margin-bottom: 0; }
-.theme-switcher { position: relative; z-index: 10; }
+.profile-avatar {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 16px;
+  line-height: 0;
+}
+.profile-avatar > img { display: block; }
+.profile-avatar .theme-switcher {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  z-index: 10;
+}
 .theme-toggle {
   display: flex;
   flex: 0 0 44px;
@@ -107,6 +120,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   color: var(--color-text);
   font: inherit;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 .theme-toggle:hover {
   background: var(--color-canvas-muted);

@@ -4,10 +4,12 @@
   {% assign metadata_styles = 'd-flex flex-items-center mb-3' %}
 {% endif %}
 
-<img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle mb-3" style="width: 150px; height: 150px; max-width: 150px;">
+<div class="profile-avatar">
+  <img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;">
+  {% include theme-switcher.html %}
+</div>
 <div class="profile-heading {% if site.layout == 'stacked' %}flex-justify-center{% endif %}">
   <h1 class="lh-condensed">{% if user.name %}{{ user.name | escape }}{% else %}{{ user.login | escape }}{% endif %}</h1>
-  {% include theme-switcher.html %}
 </div>
 <p class="mb-3 f4 theme-muted">
   {{ user.bio | escape }}

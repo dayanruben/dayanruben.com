@@ -150,6 +150,12 @@ try {
           const response = await page.goto(`${origin}/${layout}${route}`);
           assert.equal(response.status(), 200, `Page ${layout}${route} must exist`);
           assert.equal(await page.locator('#theme-toggle').count(), 1, `Theme control missing: ${layout}${route}: ${(await page.locator('body').innerText()).slice(0, 300)}`);
+          assert.equal(await page.locator('.profile-avatar #theme-toggle').count(), 1, 'Theme control must overlay the avatar');
+          assert.equal(await page.locator('.profile-heading #theme-toggle').count(), 0, 'Theme control stays off the name row');
+          const avatarBox = await page.locator('.profile-avatar').boundingBox();
+          const toggleBox = await page.locator('#theme-toggle').boundingBox();
+          assert.ok(toggleBox.x + toggleBox.width > avatarBox.x + avatarBox.width - 1, `Theme control overlaps avatar lower-right: ${JSON.stringify({ avatarBox, toggleBox })}`);
+          assert.ok(toggleBox.y + toggleBox.height > avatarBox.y + avatarBox.height - 1, `Theme control overlaps avatar lower-right: ${JSON.stringify({ avatarBox, toggleBox })}`);
           console.log(`Checking ${browserName} ${layout}${route}`);
           if (route === '/preview.html') {
             assert.ok(await page.locator('.highlight span').count() > 0, 'Render actual syntax highlighting');
