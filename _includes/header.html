@@ -30,6 +30,6 @@
     <meta property="og:description" content="{{ meta_description }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="{{ "/assets/vendor/primer.css" | relative_url }}" rel="stylesheet" type="text/css">
-    <link href="{{ "/assets/styles.css" | relative_url }}" rel="stylesheet" type="text/css">
+    <link href="{{ "/assets/styles.css" | relative_url }}?v={{ site.time | date: '%s' }}" rel="stylesheet" type="text/css">
   </head>
   <body class="min-height-full">

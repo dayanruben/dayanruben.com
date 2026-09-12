@@ -50,6 +50,7 @@ try {
     const rendered = readFileSync(join(output, name, 'index.html'), 'utf8');
     assert.ok(rendered.includes('theme-toggle'), `Rendered theme control: ${result.stdout} ${result.stderr}`);
     assert.ok(!rendered.includes('theme-options'), 'The compact control must not render a theme menu');
+    assert.match(rendered, /href="[^"]*\/assets\/styles\.css\?v=\d+"/, 'Theme stylesheet URL must change on each build to refresh cached styling');
     console.log(`PASS Jekyll build: ${name}`);
   }
   const types = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.ico': 'image/x-icon' };
