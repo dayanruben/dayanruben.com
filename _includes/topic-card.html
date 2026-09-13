@@ -1,7 +1,9 @@
-{% if topic.web_url %}
-  <a href="{{ topic.web_url }}" class="github-component position-relative hover-grow height-full no-underline d-flex flex-column flex-justify-center text-center border theme-border rounded-1 theme-surface p-5">
-    {% if topic.image_url %}
-      <img src="{{ topic.image_url }}" width="64" height="64" class="mx-auto rounded-1 mb-3" alt="{{ topic.name }}">
+{% assign topic_url_scheme = topic.web_url | split: ':' | first | downcase %}
+{% assign image_url_scheme = topic.image_url | split: ':' | first | downcase %}
+{% if topic.web_url and topic_url_scheme == 'https' %}
+  <a href="{{ topic.web_url | escape }}" class="github-component position-relative hover-grow height-full no-underline d-flex flex-column flex-justify-center text-center border theme-border rounded-1 theme-surface p-5">
+    {% if topic.image_url and image_url_scheme == 'https' %}
+      <img src="{{ topic.image_url | escape }}" width="64" height="64" class="mx-auto rounded-1 mb-3" alt="{{ topic.name | escape }}">
     {% else %}
       <div
         class="theme-accent-surface f4 theme-muted text-bold rounded-1 flex-shrink-0 text-center mx-auto mb-3"
@@ -10,15 +12,15 @@
         #
       </div>
     {% endif %}
-    <p class="f3 lh-condensed text-center theme-link-muted mb-0 mt-1">{{ topic.name }}</p>
+    <p class="f3 lh-condensed text-center theme-link-muted mb-0 mt-1">{{ topic.name | escape }}</p>
     {% if topic.description %}
-      <p class="f5 theme-muted text-center mb-0 mt-1">{{ topic.description }}</p>
+      <p class="f5 theme-muted text-center mb-0 mt-1">{{ topic.description | escape }}</p>
     {% endif %}
   </a>
 {% else %}
   <div class="github-component position-relative height-full text-center border theme-border rounded-1 theme-surface p-5">
-    {% if topic.image_url %}
-      <img src="{{ topic.image_url }}" width="64" height="64" class="mx-auto rounded-1 mb-3" alt="{{ topic.name }}">
+    {% if topic.image_url and image_url_scheme == 'https' %}
+      <img src="{{ topic.image_url | escape }}" width="64" height="64" class="mx-auto rounded-1 mb-3" alt="{{ topic.name | escape }}">
     {% else %}
       <div
         class="theme-accent-surface f4 theme-muted text-bold rounded-1 flex-shrink-0 text-center mx-auto mb-3"
@@ -27,9 +29,9 @@
         #
       </div>
     {% endif %}
-    <p class="f3 lh-condensed text-center mb-0 mt-1">{{ topic.name }}</p>
+    <p class="f3 lh-condensed text-center mb-0 mt-1">{{ topic.name | escape }}</p>
     {% if topic.description %}
-      <p class="f5 theme-muted text-center mb-0 mt-1">{{ topic.description }}</p>
+      <p class="f5 theme-muted text-center mb-0 mt-1">{{ topic.description | escape }}</p>
     {% endif %}
   </div>
 {% endif %}

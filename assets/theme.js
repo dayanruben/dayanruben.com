@@ -1,3 +1,7 @@
+// GitHub Pages cannot set response headers for this site, so break out of
+// unexpected frames as a client-side fallback for clickjacking protection.
+if (window.top !== window.self) window.top.location = window.self.location;
+
 (function () {
   'use strict';
 

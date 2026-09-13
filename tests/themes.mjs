@@ -25,6 +25,12 @@ const metadataRepository = {
   html_url: 'https://example.test/?label="repository"&version=1',
   stargazers_count: 7, forks_count: 2,
 };
+const metadataTopic = {
+  name: '<b data-topic>topic</b>',
+  web_url: 'javascript:alert(1)',
+  image_url: 'javascript:alert(2)',
+  description: '<i data-description>description</i>',
+};
 let server;
 try {
   for (const path of ['_config.yml', '_data', '_includes', '_layouts', '_sass', 'assets', 'index.html', 'favicon.ico', 'package.json']) {
@@ -34,10 +40,10 @@ try {
   mkdirSync(join(source, 'tests'));
   writeFileSync(join(source, 'tests/private.txt'), 'Validation fixtures must not be published.');
   mkdirSync(join(source, '_posts'));
-  writeFileSync(join(source, '_posts/2026-01-01-example.md'), '---\nlayout: post\ntitle: Example article\npermalink: /article/\n---\nA paragraph with [a link](#example), **bold text**, and `inline code`.\n\n> A readable quotation.\n\n## Example\n\n```ruby\n# A comment\nputs "Hello"\n```\n');
+  writeFileSync(join(source, '_posts/2026-01-01-example.md'), '---\nlayout: post\ntitle: "<b data-title>Example article</b>"\npermalink: /article/\n---\nA paragraph with [a link](#example), **bold text**, and `inline code`.\n\n> A readable quotation.\n\n## Example\n\n```ruby\n# A comment\nputs "Hello"\n```\n');
   const fixture = readFileSync(join(root, 'tests/fixtures/config.yml'), 'utf8');
   const metadataConfig = join(temporary, 'metadata-values.yml');
-  writeFileSync(metadataConfig, JSON.stringify({ github: { owner: metadataOwner, public_repositories: [metadataRepository] } }));
+  writeFileSync(metadataConfig, JSON.stringify({ github: { owner: metadataOwner, public_repositories: [metadataRepository] }, topics: [metadataTopic] }));
   const variants = { stacked: ['stacked', 'system'], sidebar: ['sidebar', 'system'], light: ['stacked', 'light'], dark: ['stacked', 'dark'], metadata: ['sidebar', 'system'] };
   for (const [name, [layout, theme]] of Object.entries(variants)) {
     const config = join(temporary, `${name}.yml`);
@@ -125,6 +131,8 @@ try {
           assert.equal(await page.locator('meta[property="og:image"]').getAttribute('content'), metadataOwner.avatar_url);
           assert.equal(await page.locator('img.circle').getAttribute('alt'), metadataText);
           assert.equal(await page.locator('img.circle').getAttribute('src'), metadataOwner.avatar_url);
+          assert.equal(await page.locator('[data-topic], [data-description]').count(), 0, 'Topic metadata must remain inert');
+          assert.equal(await page.locator('a[href^="javascript:"]').count(), 0, 'Topic URLs must use safe schemes');
           assert.equal((await page.locator('h1').first().textContent()).trim(), metadataText);
           assert.equal((await page.locator('p.mb-3').textContent()).trim(), metadataText);
           assert.equal(await page.locator('a[href^="mailto:"]').getAttribute('href'), `mailto:${metadataOwner.email}`);
@@ -150,6 +158,10 @@ try {
           const response = await page.goto(`${origin}/${layout}${route}`);
           assert.equal(response.status(), 200, `Page ${layout}${route} must exist`);
           assert.equal(await page.locator('#theme-toggle').count(), 1, `Theme control missing: ${layout}${route}: ${(await page.locator('body').innerText()).slice(0, 300)}`);
+          assert.match(await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /frame-ancestors 'none'/, 'CSP must block framing');
+          if (route === '/article/') {
+            assert.equal(await page.locator('[data-title]').count(), 0, 'Post titles must remain inert');
+          }
           assert.equal(await page.locator('.profile-avatar #theme-toggle').count(), 1, 'Theme control must overlay the avatar');
           assert.equal(await page.locator('.profile-heading #theme-toggle').count(), 0, 'Theme control stays off the name row');
           const avatarBox = await page.locator('.profile-avatar').boundingBox();

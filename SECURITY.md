@@ -2,20 +2,15 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+This site is continuously deployed from the `main` branch. Security fixes are
+applied to the current `main` deployment; historical builds are not supported.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Please report suspected vulnerabilities privately through [GitHub Private
+Vulnerability Reporting](https://github.com/dayanruben/dayanruben.com/security/advisories/new).
+Do not open a public issue containing exploit details.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Reports are acknowledged within 7 days. We will investigate the report,
+coordinate a fix where appropriate, and agree on a disclosure timeline with
+the reporter.
