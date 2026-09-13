@@ -1,0 +1,71 @@
+name: Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BUNDLE_FROZEN: "true"
+
+jobs:
+  static:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - name: Install Node tooling
+        run: npm ci
+      - name: Lint GitHub Actions workflows
+        run: docker run --rm -v "$GITHUB_WORKSPACE:/repo" -w /repo rhysd/actionlint:1.7.7
+      - name: Check formatting
+        run: npx --no-install prettier --check .github/workflows/*.yml package.json package-lock.json eslint.config.mjs
+      - name: Lint JavaScript
+        run: npx --no-install eslint assets/theme.js tests/themes.mjs
+      - name: Check Ruby syntax
+        run: ruby -wc .github/ruby-compat.rb
+      - name: Verify locked Ruby dependencies
+        run: bundle check
+      - name: Audit Node dependencies
+        run: npm audit --audit-level=high
+
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm test
+        env:
+          THEME_ARTIFACTS: ${{ runner.temp }}/theme-validation
+          RUBYOPT: -r${{ github.workspace }}/.github/ruby-compat.rb
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: theme-validation
+          path: ${{ runner.temp }}/theme-validation
+          if-no-files-found: ignore
