@@ -152,8 +152,9 @@ try {
         const context = await browser.newContext({ ignoreHTTPSErrors: true, colorScheme: 'light', viewport: { width: 1280, height: 900 } });
         const page = await context.newPage();
         const errors = [];
+        const expectedBrowserWarnings = [message => message.includes("frame-ancestors") && message.includes('ignored when delivered via')];
         page.on('pageerror', error => errors.push(error.message));
-        page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+        page.on('console', message => { if (message.type() === 'error' && !expectedBrowserWarnings.some(isExpected => isExpected(message.text()))) errors.push(message.text()); });
         for (const route of ['/', '/preview.html', '/article/']) {
           const response = await page.goto(`${origin}/${layout}${route}`);
           assert.equal(response.status(), 200, `Page ${layout}${route} must exist`);
