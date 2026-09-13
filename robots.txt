@@ -1,0 +1,5 @@
+# Public site: allow normal indexing and advertise the generated sitemap.
+User-agent: *
+Allow: /
+
+Sitemap: https://dayanruben.com/sitemap.xml

@@ -1,0 +1,23 @@
+# dayanruben.com
+
+> The personal website and portfolio of Dayan Ruben, a software engineer in Brazil. It presents his public profile, projects, interests, writing, and contact and identity resources.
+
+This is a public, static Jekyll site. Use the linked pages as the source of truth for current profile and project details. The site is published from the `main` branch of the site's GitHub repository.
+
+## Profile
+
+- [Homepage](https://dayanruben.com/): Public profile, biography, projects, interests, and latest writing.
+- [GitHub profile](https://github.com/dayanruben): Public source repositories and contribution history.
+- [LinkedIn profile](https://www.linkedin.com/in/dayanruben/): Professional profile.
+- [Keybase profile](https://keybase.io/dayanruben): Public identity proofs and OpenPGP key directory.
+
+## Contact and verification
+
+- [Security policy](https://dayanruben.com/SECURITY/): How to report a suspected vulnerability privately.
+- [OpenPGP public key](https://dayanruben.com/pgp.txt): Public key for identity verification and encrypted communication.
+- [Security contact](https://dayanruben.com/.well-known/security.txt): Machine-readable vulnerability-reporting contact and policy metadata.
+
+## Optional
+
+- [Atom feed](https://dayanruben.com/feed.xml): Updates for published articles.
+- [Source repository](https://github.com/dayanruben/dayanruben.com): Site source, templates, configuration, and validation tooling.

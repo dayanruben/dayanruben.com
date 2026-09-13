@@ -1,10 +1,15 @@
 layout: stacked
 style: system
+title: Dayan Ruben
+description: Personal website and portfolio of Dayan Ruben, software engineer.
+url: https://dayanruben.com
 
 plugins:
   - jekyll-octicons
   - jekyll-github-metadata
   - jemoji
+  - jekyll-feed
+  - jekyll-sitemap
 
 permalink: /:year/:month/:day/:title/
 
@@ -62,5 +67,16 @@ social_media:
 
 include: [".well-known"]
 
-# Local/CI validation tools are not published by GitHub Pages.
-exclude: ["tests", "node_modules", "package.json", "package-lock.json"]
+# Local/CI validation tools and repository-only guidance are not published by GitHub Pages.
+exclude:
+  - "tests"
+  - "node_modules"
+  - "package.json"
+  - "package-lock.json"
+  - "AGENTS.md"
+  - "CLAUDE.md"
+  - "README.md"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "eslint.config.mjs"
+  - "security_best_practices_report.md"

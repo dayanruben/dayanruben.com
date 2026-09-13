@@ -10,6 +10,7 @@ This repository is a Jekyll static personal website published by GitHub Pages. I
 - `assets/styles.scss` and `assets/theme.js` — theme tokens, component styling, and the system/light/dark preference control.
 - `_data/` — social icon definitions and color data.
 - `tests/` — temporary-fixture browser checks for rendered themes, metadata safety, contrast, and accessibility.
+- `robots.txt`, `humans.txt`, `llms.txt`, `pgp.txt`, and `.well-known/security.txt` — public crawler, agent, credit, identity, and security-contact metadata.
 - `.github/workflows/` — static checks and the GitHub Pages build/deploy workflow.
 - `Gemfile`/`Gemfile.lock` and `package.json`/`package-lock.json` — locked Ruby and Node toolchains.
 
@@ -55,6 +56,16 @@ The CI `checks.yml` workflow runs the same static checks and browser suite. The 
 - Put posts in `_posts/` with `YYYY-MM-DD-title.md` names and valid YAML front matter.
 - Keep social profiles and supported icon markup in `_config.yml` and `_data/social_media.yml`; do not duplicate service URL logic in templates.
 - Do not commit credentials, tokens, generated `_site/` output, browser artifacts, or local dependency directories.
+
+</important>
+
+<important if="you are changing crawler, agent, security, or identity metadata">
+
+- Keep `robots.txt` limited to crawl guidance and its absolute `Sitemap` URL; it is not an access-control mechanism.
+- Keep `llms.txt` concise, truthful, and link-based. It is a proposed agent-readable index and does not replace `robots.txt`.
+- Maintain `.well-known/security.txt` as UTF-8 plain text with an HTTPS `Contact`, `Policy`, `Canonical`, and a renewed `Expires` date before it becomes stale.
+- `pgp.txt` must contain public material only. Refresh it from the Keybase account when the primary fingerprint changes; never commit a private key.
+- Treat `humans.txt` as optional public credit. Include only people and contact details that are intentionally public.
 
 </important>
 
