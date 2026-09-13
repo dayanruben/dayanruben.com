@@ -1,252 +1,168 @@
-# Get started building your personal website
+# Dayan Ruben · Personal Website
 
-### Showcase your software development skills
+[![Checks](https://github.com/dayanruben/dayanruben.com/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/dayanruben/dayanruben.com/actions/workflows/checks.yml)
+[![Deploy site](https://github.com/dayanruben/dayanruben.com/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/dayanruben/dayanruben.com/actions/workflows/deploy.yml)
+[![Live site](https://img.shields.io/website?url=https%3A%2F%2Fdayanruben.com&label=website)](https://dayanruben.com/)
+[![Built with Jekyll](https://img.shields.io/badge/built_with-Jekyll-cc0000?logo=jekyll&logoColor=white)](https://jekyllrb.com/)
+[![Hosted on GitHub Pages](https://img.shields.io/badge/hosted_on-GitHub_Pages-222222?logo=github&logoColor=white)](https://pages.github.com/)
+[![License](https://img.shields.io/github/license/dayanruben/dayanruben.com)](LICENSE.txt)
 
-This repository gives you the code you'll need to kickstart a personal website that showcases your work as a software developer. And when you manage the code in a GitHub repository, it will automatically render a webpage with the owner's profile information, including a photo, bio, and repositories.
+The source for [dayanruben.com](https://dayanruben.com/), Dayan Ruben's personal website and portfolio. It is a small, accessible, static site for sharing a professional profile, projects, interests, writing, and public contact and identity resources.
 
-Your personal website is waiting to be personalized, though. It includes space to highlight your specific areas of interest in software development, like languages or industries. And it's standing by to publish your next great blog post.
+The site is built with [Jekyll](https://jekyllrb.com/), [GitHub Pages](https://pages.github.com/), [Primer CSS](https://primer.style/), Sass, and a small amount of vanilla JavaScript. GitHub metadata powers the optional project and profile sections.
 
-It's all possible using the combination of [Jekyll](https://jekyllrb.com/docs/) (for building your website), [GitHub Pages](https://pages.github.com/) (for hosting your website), and [GitHub's API](https://developer.github.com/v3/) (for automatically populating your website with content).
+## Contents
 
-## Installation
+- [Quick links](#quick-links)
+- [Technology](#technology)
+- [Run locally](#run-locally)
+- [Validate changes](#validate-changes)
+- [Update the site](#update-the-site)
+- [Public resources](#public-resources)
+- [Project structure](#project-structure)
+- [Deployment](#deployment)
+- [Security](#security)
+- [License](#license)
 
-### Fork the `github/personal-website` repo
+## Quick links
 
-You'll be making your own copy of the "personal website starter" repository so you have your own project to customize. A "fork" is a copy of a repository. So select "Fork" atop [the `github/personal-website` repository](https://github.com/github/personal-website).
+| Resource          | Link                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| Live website      | [dayanruben.com](https://dayanruben.com/)                                            |
+| Source repository | [github.com/dayanruben/dayanruben.com](https://github.com/dayanruben/dayanruben.com) |
+| GitHub profile    | [github.com/dayanruben](https://github.com/dayanruben)                               |
+| LinkedIn          | [linkedin.com/in/dayanruben](https://www.linkedin.com/in/dayanruben/)                |
+| Keybase           | [keybase.io/dayanruben](https://keybase.io/dayanruben)                               |
+| Security policy   | [SECURITY.md](SECURITY.md)                                                           |
 
-Once you've found a home for your forked repository, it's yours. You're the owner, so you're ready to publish, if you wish.
+## Technology
 
-### Install in your local development environment
+- **Build:** Jekyll with GitHub Pages-compatible Ruby gems
+- **Presentation:** Primer CSS, Sass, Liquid templates, and responsive layouts
+- **Interaction:** Same-origin vanilla JavaScript for the system/light/dark theme control
+- **Quality:** Playwright browser coverage for Chromium, Firefox, and WebKit, plus Axe accessibility checks
+- **Automation:** GitHub Actions for static checks, browser validation, and Pages deployment
+- **Runtime used in CI:** Ruby 3.2 and Node.js 22
 
-If you want to manage your website in a local web development environment, you'll be using [Ruby](https://jekyllrb.com/docs/installation/).
+## Run locally
 
-Once you've found a home for your forked repository, **[clone it](https://help.github.com/articles/cloning-a-repository/)**.
+Install Ruby 3.2, Bundler, Node.js 22, and Git. From the repository root:
 
-#### Install Jekyll
-
-Jekyll is a [Ruby Gem](https://jekyllrb.com/docs/ruby-101/#gems) that can be installed on most systems.
-
-1. Install a full [Ruby development environment](https://jekyllrb.com/docs/installation/)
-2. Install Jekyll and [bundler](https://jekyllrb.com/docs/ruby-101/#bundler) [gems](https://jekyllrb.com/docs/ruby-101/#gems)
-```
-gem install jekyll bundler
-```
-3. Change into your new directory
-```
-cd personal-website
-```
-4. Install missing gems
-```
+```sh
 bundle install
-```
-5. Build the site and make it available on a local server
-```
-bundle exec jekyll serve
+npm ci
+npx playwright install chromium firefox webkit
 ```
 
-You should see something like:
+Start Jekyll with live reload:
 
-```
-Configuration file: /octocat/personal-website/_config.yml
-            Source: /octocat/personal-website
-       Destination: /octocat/_site
- Incremental build: disabled. Enable with --incremental
-      Generating...
-   GitHub Metadata: No GitHub API authentication could be found. Some fields may be missing or have incorrect data.
-                    done in 14.729 seconds.
- Auto-regeneration: enabled for '/octocat/personal-website'
-    Server address: http://127.0.0.1:4000
-  Server running... press ctrl-c to stop.
+```sh
+RUBYOPT="-r$PWD/.github/ruby-compat.rb" bundle exec jekyll serve
 ```
 
-Don't worry about the "No GitHub API authentication could be found" message. [API authentication is only necessary](https://github.com/jekyll/github-metadata/blob/master/docs/authentication.md) if you intend to display more detailed metadata, like a branch name.
+Open [http://127.0.0.1:4000](http://127.0.0.1:4000). The compatibility shim keeps the GitHub Pages dependency set working with current Ruby standard-library packaging; omit <code>RUBYOPT</code> only when your local toolchain does not need it.
 
-6. Now browse to [http://localhost:4000](http://localhost:4000)
+## Validate changes
 
-### Publish
+Run the browser and accessibility suite before pushing:
 
-When you host your personal website's code on GitHub, you get the support of free hosting through GitHub Pages.
-
-**The fastest approach** is to rename your repository `username.github.io`, where `username` is your GitHub username (or organization name). Then, the next time you push any changes to your repository's `master` branch, they'll be accessible on the web at your `username.github.io` address.
-
-**If you want to use a custom domain**, you'll want to add it to your repository's "Custom domain" settings on github.com. And then register and/or [configure your domain with a DNS provider](https://help.github.com/articles/quick-start-setting-up-a-custom-domain/).
-
-### Site discovery and contact files
-
-The published site includes a few small, machine-readable files alongside the HTML:
-
-- `robots.txt` permits normal public crawling and points crawlers to the generated `sitemap.xml`.
-- `sitemap.xml` and `feed.xml` are generated by the `jekyll-sitemap` and `jekyll-feed` plugins.
-- `llms.txt` gives assistants a concise, curated map of the portfolio and public profiles. It complements `robots.txt`; it does not control access.
-- `humans.txt` credits the people and open-source projects behind the site.
-- `.well-known/security.txt` points security researchers to GitHub Private Vulnerability Reporting. Its `Expires` date should be renewed before it becomes stale.
-- `pgp.txt` contains the current public OpenPGP key published through [Keybase](https://keybase.io/dayanruben) for identity verification and encrypted communication.
-
-Repository-only instructions and tooling are excluded from the generated site. Keep public contact details and keys current when changing accounts or security-reporting channels.
-
-## Customization
-
-It's your website, and you control the source code. So you can customize everything, if you like. But we've provided a handful of quick customizations for you to consider as you get your website off the ground.
-
-### Quick configuration changes
-
-Most customizations can be done in a matter of seconds, by revising your repository's `_config.yml` file. Just remember to restart your local server each time you save new changes so your Jekyll-powered website rebuilds correctly:
-
-1. Shut down your server by entering the keyboard command <kbd>CTRL</kbd>+<kbd>c</kbd>
-2. Restart your server: `bundle exec jekyll serve`
-
-
-#### Layout
-
-Your website will display in a two-column layout by default on larger-screen devices, with your photo, name, and basic information displayed in a left-aligned "sidebar." You can quickly switch to a "stacked" single-column layout by changing the line in your `_config.yml` file that reads `layout: sidebar` to `layout: stacked`.
-
-#### Style
-
-The website follows the visitor's browser or system color preference by default (`style: system` in `_config.yml`). A compact theme icon beside the profile name switches between Light, Dark, and System, and the selected preference is remembered in this browser across pages, visits, and tabs.
-
-The existing `style: light` and `style: dark` settings remain supported as defaults for visitors without a saved choice. An explicit visitor selection takes precedence. If browser storage is unavailable, switching still works for the current page. Without JavaScript, CSS applies the configured default (including automatic System colors), and the manual control stays hidden.
-
-Theme colors live in `assets/styles.scss`; monochrome SVG icons use `currentColor`, and two-tone icon details use `--color-icon-cutout`. The small, same-origin `assets/theme.js` script runs before the stylesheets to restore a saved choice before the page paints. Keep the shared Content Security Policy compatible with `script-src 'self'`; inline and third-party scripts are not needed.
-
-#### Validate themes
-
-Install the Ruby dependencies with `bundle install`, then install the browser test tools with `npm ci` and `npx playwright install chromium firefox webkit`. Run `npm test` before pushing. The Checks workflow runs the same suite on pull requests and on manual dispatches.
-
-The suite builds temporary fixture pages for both layouts and all three theme defaults, then checks Chromium, Firefox, and WebKit. It covers theme persistence, system changes, keyboard controls, mobile layout, unchanged typography, SVG fill inheritance, icon contrast, and WCAG accessibility checks. Fixtures use local metadata and are never published. Screenshots and color results are written to the system temporary directory, or to `THEME_ARTIFACTS` when set. Also run `bundle exec jekyll build` with valid GitHub metadata access to validate the production configuration.
-
-#### Projects
-
-The "My Projects" section of your website is generated by default with your nine most recently "pushed" repositories. It also excludes repositories that you forked, by default. But each of these parameters can be quickly customized in your repository's `_config.yml` file, under the `projects` dictionary line.
-
-Parameters include:
-
-- `sort_by`: The method by which repositories are sorted. Options include `pushed` and `stars`.
-- `limit`: The maximum number of repositories that will be displayed in the "My Projects" section of your website. Out of the box, this number is set to `9`.
-- `exclude`:
-   - `forks`: When `true`, repositories you've forked will be excluded from the listing.
-   - `projects`: A list the repository names you want to exclude from the listing.
-
-#### Topics
-
-Your website comes pre-configured with three topics (e.g. "Web design" and "Sass") that appear in a section titled "My Interests." These are also stored in your repository's `_config.yml` file, where you can define each topic's name and two other optional details:
-
-- `web_url`: The web address you'd like to your topic to link to (e.g. `https://github.com/topics/sass`).
-- `image_url`: The web address of an (ideally square) image that you'd like to appear with your topic.
-
-#### Social media
-
-Your website supports linking and sharing to social media services you're using, including Behance, Dribbble, Facebook, LinkedIn, Medium, Stack Overflow, X, and YouTube. To identify the services you use:
-
-1. Edit your repository's `_config.yml` file.
-2. Edit the `social_media` dictionary line, and represent the services you like in a simple `key: value` form:
-
-```
-social_media:
-  behance: your_username
-  dribbble: your_username  
-  facebook: your_username
-  hackerrank: your_username
-  instagram: your_username
-  keybase: your_username
-  bluesky: your_username
-  linkedin: your_username
-  medium: your_username
-  stackoverflow: your_user_id
-  telegram: your_username
-  x: your_username
-  unsplash: your_username
-  vk: your_username
-  website: http://your_website_url
-  youtube: your_username
-  threads: your_username
+```sh
+npm test
 ```
 
-Links to your profile for each of the services you define will appear in the `<header>` of your website, appended to your bio. And if those services support sharing, any blog posts that you publish will include links to share that post using each social media service.
+The suite builds isolated Jekyll fixtures for both layouts and all three theme defaults. It checks theme persistence, system preference changes, keyboard activation, mobile layout, typography, SVG color inheritance, contrast, and Axe violations. Fixtures and screenshots stay outside the published site.
 
-**Note**: This feature is supported by two files in your repository:
+Run the production build and static checks when changing templates, configuration, styles, workflows, or dependencies:
 
-- `/_data/social_media.yml`: Defines each of the supported services, including variable name, display name, URL path, and SVG icon.
-- `/_includes/social_media_share_url.html`: Outputs the share URL required for any of the supported social media services that support sharing URLs.
-
-If you're interested in adding a social media service that's not already supported in this repo, you can edit these two files to build that support.
-
-## Adding pages
-
-To **add a page** to your website (e.g. detailed resume):
-
-1. Create a new `.html` or `.md` file at the root of your repository.
-2. Give it a filename that you want to be used in the page's URL (e.g. `http://yoursite.dev/filename`).
-3. At the start of your file, include the following [front matter](https://jekyllrb.com/docs/front-matter/):
-
+```sh
+RUBYOPT="-r$PWD/.github/ruby-compat.rb" bundle exec jekyll build
+npx --no-install eslint assets/theme.js tests/themes.mjs
+npx --no-install prettier --check .github/workflows/*.yml package.json package-lock.json eslint.config.mjs
+ruby -wc .github/ruby-compat.rb
+bundle check
+npm audit --audit-level=high
+git diff --check
 ```
+
+GitHub Actions runs the same static checks and browser suite for pull requests and manual checks. The workflow files are also linted with [actionlint](https://github.com/rhysd/actionlint).
+
+## Update the site
+
+### Profile, projects, interests, and social links
+
+Edit [_config.yml](_config.yml) for the site title, description, layout, default theme, project filtering, interests, and supported social profiles. Keep profile URLs and public contact details current. Social icons and share URLs are defined in [_data/social_media.yml](_data/social_media.yml).
+
+### Writing
+
+Add a Markdown file to [_posts/](_posts/) using <code>YYYY-MM-DD-title.md</code> and Jekyll front matter:
+
+```markdown
 ---
-layout: default
+title: "A useful title"
 ---
+
+Your article content.
 ```
 
-## Adding blog posts
+The post layout, Atom feed, and sitemap are generated by Jekyll. A post with <code>published: false</code> remains available in source control without appearing on the public site.
 
-To **add a blog post** to your website:
+### Pages, templates, and styles
 
-1. Create a new `.md` file in your repository's `/_posts/` directory.
-2. Give it a filename using the following format:
+- Add standalone pages at the repository root with <code>layout: default</code> front matter.
+- Reuse components in [_includes/](_includes/) and page shells in [_layouts/](_layouts/).
+- Update [assets/styles.scss](assets/styles.scss) for visual tokens and component styles.
+- Keep theme behavior in [assets/theme.js](assets/theme.js) compatible with system preference, keyboard use, storage failures, and the site's same-origin script policy.
 
-```
-YEAR-MONTH-DAY-title.MARKUP
-```
+## Public resources
 
-3. At the start of your file, include the following [front matter](https://jekyllrb.com/docs/front-matter/):
+These files are intentionally published beside the HTML site:
 
-```
----
-title: "The title of my blog post"
----
-```
+| File                                                  | Purpose                                                                                                                                                     |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [robots.txt](robots.txt)                              | Crawl guidance and the absolute sitemap URL. It is not access control.                                                                                      |
+| [sitemap.xml](https://dayanruben.com/sitemap.xml)     | Generated URL index from <code>jekyll-sitemap</code>.                                                                                                       |
+| [feed.xml](https://dayanruben.com/feed.xml)           | Generated Atom feed from <code>jekyll-feed</code>.                                                                                                          |
+| [llms.txt](llms.txt)                                  | A concise, link-based overview for assistants and language models. It follows the [proposed llms.txt format](https://llmstxt.org/).                         |
+| [humans.txt](humans.txt)                              | Optional credit for the people and open-source projects behind the site.                                                                                    |
+| [/.well-known/security.txt](.well-known/security.txt) | Machine-readable vulnerability-reporting contact, policy, encryption key, and expiry metadata. See [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116.html). |
+| [pgp.txt](pgp.txt)                                    | The public OpenPGP key published from [Keybase](https://keybase.io/dayanruben). Never replace it with private key material.                                 |
+| [CNAME](CNAME)                                        | GitHub Pages custom-domain configuration for <code>dayanruben.com</code>.                                                                                   |
+| [/.well-known/nostr.json](.well-known/nostr.json)     | Nostr identity verification metadata.                                                                                                                       |
 
-Your website comes with a placeholder blog post that you can reference. Notably, its [front matter](https://jekyllrb.com/docs/front-matter/) declares `published` as `false`, so that it won't appear on your website.
+When changing a security contact, domain, profile, or key, update the relevant files together and verify the generated output. The Pages artifact workflow preserves the hidden <code>.well-known/</code> directory intentionally.
 
-While you can define a `layout` in the front matter, your website is pre-configured to assign the `post` layout to all of the posts in your `/_posts/` directory. So you don't have to declare that in your posts.
+## Project structure
 
-Jekyll's conventions for authoring and managing blog posts is very flexible. You can [learn more in Jekyll's documentation for "Posts."](https://jekyllrb.com/docs/posts/)
+| Path                                     | Responsibility                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [_config.yml](_config.yml)               | Jekyll settings, site metadata, projects, social profiles, plugins, and publish exclusions |
+| [_layouts/](_layouts/)                   | Page and post shells                                                                       |
+| [_includes/](_includes/)                 | Shared Liquid components such as the header, masthead, cards, and footer                   |
+| [_posts/](_posts/)                       | Dated Markdown articles                                                                    |
+| [assets/](assets/)                       | Sass, JavaScript, and vendored Primer CSS                                                  |
+| [_data/](_data/)                         | Social service definitions and color data                                                  |
+| [tests/](tests/)                         | Temporary-fixture browser, accessibility, metadata, and theme checks                       |
+| [.github/workflows/](.github/workflows/) | Static validation and GitHub Pages deployment                                              |
+| [AGENTS.md](AGENTS.md)                   | Repository instructions for safe changes and validation                                    |
+| [CLAUDE.md](CLAUDE.md)                   | Symlink to <code>AGENTS.md</code> for compatible coding agents                             |
 
-## Content and templates
+Generated <code>_site/</code>, browser artifacts, <code>node_modules/</code>, and repository-only documentation are excluded from the public build.
 
-To give you a sound foundation to start your personal website, your repository includes a handful of "includes" -- dynamic `.html` files that are re-used throughout your website. They're all stored in the `/_includes/` directory.
+## Deployment
 
-There are the usual suspects, like `header.html` and `footer.html`. But there are few more worth pointing out:
+Pushing to <code>main</code> triggers [Deploy site](.github/workflows/deploy.yml), which builds the Jekyll site, uploads the artifact, and deploys it to GitHub Pages. The workflow is configured for the custom domain in [CNAME](CNAME) and keeps <code>.well-known/</code> metadata in the artifact.
 
-- `interests.html`: A heading and dynamic list of "My Interests," which is populated with the [topics](#topics) you list in your `_config.yml`.
-- `masthead.html`: A collection of your avatar, name, bio, and other metadata that's displayed prominently on all your webpages to help identify what the website is about.
-- `post-card.html`: A compact, summarized presentation of a blog post, re-used to display a listing of your latest blog posts.
-- `projects.html`: A heading and dynamic list of "My Projects," which is populated with a listing of your newest GitHub repositories.
-- `repo-card.html`: A compact, summarized presentation of a repository, re-used to display a listing of your GitHub repositories.
-- `thoughts.html`: A heading and dynamic list of "My Thoughts," which is populated with a listing of your latest blog posts.
-- `topic-card.html`: A compact, summarized presentation of a topic (defined in your `_config.yml`), re-used to display a listing of your interests.
+For a new fork or replacement repository:
 
-### Layouts
+1. Enable **Settings → Pages → GitHub Actions** as the build source.
+2. Configure the custom domain and its DNS records.
+3. Push the desired site version to <code>main</code>.
+4. Confirm the deployment and check the generated <code>robots.txt</code>, sitemap, feed, security file, and identity resources on the live domain.
 
-Your repository comes with three layouts:
+## Security
 
-- **default**: Not used by any of the built-in pages or posts, but useful for any new pages you create.
-- **home**: Used by your `index.html` homepage to display listings of your projects, interests, and (optionally) your blog posts.
-- **post**: Used by default by the posts in your `/_posts/` directory.
-
-Jekyll's convention for defining layouts is very flexible. You can [learn more about customizing your layouts in the Jekyll "Layouts" docs.](https://jekyllrb.com/docs/layouts/)
-
-## Styles
-
-Your website is pre-configured to use [GitHub's very flexible CSS framework called "Primer,"](https://styleguide.github.com/primer/). The bundled stylesheet is served locally from `assets/vendor/primer.css`, and the site's custom overrides live in `assets/styles.scss`:
-
-```
-<link href="{{ "/assets/vendor/primer.css" | relative_url }}" rel="stylesheet" type="text/css">
-<link href="{{ "/assets/styles.css" | relative_url }}" rel="stylesheet" type="text/css">
-```
-
-You are, of course, welcome to remove it or replace it with another framework. Just bear in mind that the HTML that your website came pre-packaged with references multiple Primer "utility classes" to define things like column widths, margins, and background colors.
-
-You also have the option to add on to and extend Primer's styles by adding custom CSS to your `/assets/styles.scss` Sass stylesheet. By editing this file, you can customize your website's color scheme, typography, and more.
-
+Read the [security policy](SECURITY.md) before reporting an issue. Use GitHub Private Vulnerability Reporting for suspected vulnerabilities; do not publish exploit details in a public issue. The repository may contain a public OpenPGP key, but it must never contain private keys, credentials, tokens, or generated secrets.
 
 ## License
 
-The theme is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+This project is available under the [MIT License](LICENSE.txt). The site began from GitHub's [personal-website](https://github.com/github/personal-website) project; see the repository history and license for attribution.
