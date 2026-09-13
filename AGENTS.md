@@ -73,6 +73,7 @@ The CI `checks.yml` workflow runs the same static checks and browser suite. The 
 
 - Update the matching lockfile and run `npm ci`, `bundle check`, the relevant audits, Prettier, and actionlint before delivery.
 - Keep third-party Actions pinned to full commit SHAs with version comments, retain least-privilege permissions, and preserve `BUNDLE_FROZEN` in CI.
+- Keep `include-hidden-files: true` on `upload-pages-artifact` because the public `.well-known/` metadata is intentionally deployed; review hidden build output before changing this setting.
 - Changes to `main` trigger deployment. Verify the exact pushed SHA and terminal workflow conclusions with `gh`; an older green run does not validate a new commit.
 
 </important>
