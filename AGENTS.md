@@ -86,3 +86,8 @@ The CI `checks.yml` workflow runs the same static checks and browser suite. The 
 - Delete remote branches only when they are explicitly identified as temporary or the user explicitly requests remote cleanup. Keep the repository's persistent branches and unrelated worktrees.
 
 </important>
+
+<!-- entire-agent:begin -->
+Read .entire/agent-guide.md for this repository's workflow, source inspection, and verification guidance.
+@.entire/agent-guide.md
+<!-- entire-agent:end -->
