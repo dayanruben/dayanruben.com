@@ -71,6 +71,7 @@ include: [".well-known"]
 exclude:
   - "tests"
   - "node_modules"
+  - "vendor/bundle"
   - "package.json"
   - "package-lock.json"
   - "AGENTS.md"
