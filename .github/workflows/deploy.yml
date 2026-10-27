@@ -32,6 +32,8 @@ jobs:
         run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
+          PAGES_REPO_NWO: ${{ github.repository }}
+          JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUNDLE_FROZEN: "true"
           RUBYOPT: -r${{ github.workspace }}/.github/ruby-compat.rb
       - name: Upload artifact
