@@ -1,0 +1,1 @@
+now configure dependabot correctly in the project for automatically open dependancy updates in this project
