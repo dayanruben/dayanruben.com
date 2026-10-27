@@ -84,7 +84,7 @@ npm audit --audit-level=high
 git diff --check
 ```
 
-GitHub Actions runs the same static checks and browser suite for pull requests and manual checks. The workflow files are also linted with [actionlint](https://github.com/rhysd/actionlint).
+GitHub Actions runs the same static checks and browser suite for pull requests, pushes to `main`, and manual checks. The Checks badge reports the latest run on `main`. The workflow files are also linted with [actionlint](https://github.com/rhysd/actionlint).
 
 ## Update the site
 
