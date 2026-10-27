@@ -1,0 +1,9 @@
+merge all open PRs into main branch bypassing the required review, make all necessary validations and fixes, also ensure to leave ci green
+
+---
+
+I approve to make the merge of all those dependabot branches locally first, make the compatibility changes, validations and then push
+
+---
+
+merge now into main, validate and push
