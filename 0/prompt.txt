@@ -1,0 +1,5 @@
+fix the Checks badge in the README that is failing but the workflow https://github.com/dayanruben/dayanruben.com/actions/workflows/checks.yml is actually green
+
+---
+
+commit and push the changes
