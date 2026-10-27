@@ -1,0 +1,1 @@
+update the env var SOLIX_GIT_TOKEN with a valid github token from my account dayanruben in github, without exposing the token
