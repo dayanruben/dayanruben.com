@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 gem 'jekyll', '~> 4.4.1'
-gem 'jekyll-feed', '~> 0.15'
+gem 'jekyll-feed', '~> 0.18'
 gem 'jekyll-sitemap', '~> 1.4'
 gem "jekyll-github-metadata"
 gem "jekyll-octicons"
