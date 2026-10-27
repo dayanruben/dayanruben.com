@@ -1,0 +1,1 @@
+Resolve the following security vulnerability https://github.com/dayanruben/dayanruben.com/security/dependabot pushing the changes directly to main branch and leaving ci green
