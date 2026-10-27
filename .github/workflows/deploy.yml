@@ -22,13 +22,18 @@ jobs:
           persist-credentials: false
       - name: Configure GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
         with:
-          source: ./
-          destination: ./_site
+          ruby-version: "3.2"
+          bundler-cache: true
         env:
-          RUBYOPT: -r/github/workspace/.github/ruby-compat.rb
+          BUNDLE_FROZEN: "true"
+      - name: Build with Jekyll
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+          BUNDLE_FROZEN: "true"
+          RUBYOPT: -r${{ github.workspace }}/.github/ruby-compat.rb
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
