@@ -66,6 +66,8 @@ try {
   cpSync(join(root, 'tests/fixtures/preview.html'), join(source, 'preview.html'));
   mkdirSync(join(source, 'tests'));
   writeFileSync(join(source, 'tests/private.txt'), 'Validation fixtures must not be published.');
+  mkdirSync(join(source, 'lighthouse-reports'));
+  writeFileSync(join(source, 'lighthouse-reports/mobile-1.json'), '{"retained":true}\n');
   mkdirSync(join(source, '_posts'));
   writeFileSync(join(source, '_posts/2026-01-01-example.md'), '---\nlayout: post\ntitle: "<b data-title>Example article</b>"\npermalink: /article/\n---\nA paragraph with [a link](#example), **bold text**, and `inline code`.\n\n> A readable quotation.\n\n## Example\n\n```ruby\n# A comment\nputs "Hello"\n```\n');
   writeFileSync(join(source, '_posts/2026-01-02-empty.md'), '---\nlayout: post\ntitle: Empty article\npermalink: /empty-article/\n---\n\n');
@@ -83,6 +85,7 @@ try {
     const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', join(output, name), '--config', configs], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
     assert.equal(result.status, 0, `Jekyll ${name}: ${result.stderr}\n${result.stdout}`);
     assert.ok(!existsSync(join(output, name, 'tests')), 'Validation tools must not be published');
+    assert.ok(!existsSync(join(output, name, 'lighthouse-reports')), 'Lighthouse reports must not be published');
     assert.ok(!existsSync(join(output, name, 'package.json')), 'Node tooling must not be published');
     const rendered = readFileSync(join(output, name, 'index.html'), 'utf8');
     assert.ok(rendered.includes('theme-toggle'), `Rendered theme control: ${result.stdout} ${result.stderr}`);

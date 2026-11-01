@@ -73,6 +73,7 @@ include: [".well-known"]
 # Local/CI validation tools and repository-only guidance are not published by GitHub Pages.
 exclude:
   - "tests"
+  - "lighthouse-reports"
   - "node_modules"
   - "vendor/bundle"
   - "package.json"

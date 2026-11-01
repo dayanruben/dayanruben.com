@@ -2,13 +2,15 @@
   "name": "dayanruben-website-checks",
   "private": true,
   "scripts": {
-    "test": "node tests/themes.mjs"
+    "test": "node tests/themes.mjs",
+    "audit": "node tests/lighthouse-audit.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "axe-core": "4.14.0",
     "eslint": "10.13.0",
     "globals": "17.13.0",
+    "lighthouse": "13.6.0",
     "playwright": "1.64.1",
     "prettier": "3.9.10"
   }
