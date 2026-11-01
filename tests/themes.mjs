@@ -9,6 +9,15 @@ import axe from 'axe-core';
 
 const root = resolve(import.meta.dirname, '..');
 const temporary = realpathSync(mkdtempSync(join(tmpdir(), 'website-themes-')));
+// macOS 27 blocks terminal-launched Firefox 157 from ~/Library/Application Support/Firefox.
+if (process.platform === 'darwin' && !process.env.MOZ_APP_DATA) {
+  const firefoxAppData = join(temporary, 'firefox-app-data');
+  const firefoxLocalAppData = join(temporary, 'firefox-local-app-data');
+  mkdirSync(firefoxAppData, { recursive: true });
+  mkdirSync(firefoxLocalAppData, { recursive: true });
+  process.env.MOZ_APP_DATA = firefoxAppData;
+  process.env.MOZ_LOCAL_APP_DATA = firefoxLocalAppData;
+}
 const source = join(temporary, 'source');
 const output = join(temporary, 'site');
 const artifacts = resolve(process.env.THEME_ARTIFACTS || join(tmpdir(), 'website-theme-validation'));
@@ -41,6 +50,10 @@ try {
   writeFileSync(join(source, 'tests/private.txt'), 'Validation fixtures must not be published.');
   mkdirSync(join(source, '_posts'));
   writeFileSync(join(source, '_posts/2026-01-01-example.md'), '---\nlayout: post\ntitle: "<b data-title>Example article</b>"\npermalink: /article/\n---\nA paragraph with [a link](#example), **bold text**, and `inline code`.\n\n> A readable quotation.\n\n## Example\n\n```ruby\n# A comment\nputs "Hello"\n```\n');
+  writeFileSync(join(source, '_posts/2026-01-02-empty.md'), '---\nlayout: post\ntitle: Empty article\npermalink: /empty-article/\n---\n\n');
+  writeFileSync(join(source, 'explicit-description.html'), '---\nlayout: default\ntitle: Explicit description\ndescription: Explicit page description\npermalink: /explicit-description/\n---\nExplicit body.\n');
+  writeFileSync(join(source, 'hostile-description.html'), '---\nlayout: default\ntitle: Hostile description\ndescription: \'Profile "<b data-metadata>text</b> & friends\'\npermalink: /hostile-description/\n---\nHostile body.\n');
+  writeFileSync(join(source, 'blank-description.html'), '---\nlayout: default\ntitle: Blank description\ndescription: "   "\npermalink: /blank-description/\n---\nBlank body.\n');
   const fixture = readFileSync(join(root, 'tests/fixtures/config.yml'), 'utf8');
   const metadataConfig = join(temporary, 'metadata-values.yml');
   writeFileSync(metadataConfig, JSON.stringify({ github: { owner: metadataOwner, public_repositories: [metadataRepository] }, topics: [metadataTopic] }));
@@ -59,6 +72,39 @@ try {
     assert.match(rendered, /href="[^"]*\/assets\/styles\.css\?v=\d+"/, 'Theme stylesheet URL must change on each build to refresh cached styling');
     console.log(`PASS Jekyll build: ${name}`);
   }
+  function descriptionContent(html, label) {
+    const name = html.match(/<meta name="description" content="([^"]*)" \/>/);
+    const openGraph = html.match(/<meta property="og:description" content="([^"]*)" \/>/);
+    assert.ok(name && openGraph, `${label} description meta missing`);
+    assert.equal(openGraph[1], name[1], `${label} Open Graph description reuses the resolved description`);
+    return name[1];
+  }
+  function buildDescription(name, bioYaml) {
+    const config = join(temporary, `description-${name}.yml`);
+    writeFileSync(config, fixture.replace('    bio: Software engineer', `    bio: ${bioYaml}`));
+    const destination = join(output, `description-${name}`);
+    const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', destination, '--config', `${join(source, '_config.yml')},${config}`], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
+    assert.equal(result.status, 0, `Jekyll description ${name}: ${result.stderr}\n${result.stdout}`);
+    return destination;
+  }
+  const siteDescription = 'Local theme validation fixtures';
+  for (const [name, bioYaml] of Object.entries({ empty: '""', nil: 'null', whitespace: '"   \\n   "', markup: '"<b></b>"' })) {
+    const destination = buildDescription(name, bioYaml);
+    assert.equal(descriptionContent(readFileSync(join(destination, 'index.html'), 'utf8'), name), siteDescription, `${name} bio falls back to the site description`);
+    assert.equal(descriptionContent(readFileSync(join(destination, 'explicit-description/index.html'), 'utf8'), name), 'Explicit page description', `${name} bio still honors an explicit page description`);
+    assert.equal(descriptionContent(readFileSync(join(destination, 'empty-article/index.html'), 'utf8'), name), siteDescription, `${name} empty article falls back to the site description`);
+    const article = descriptionContent(readFileSync(join(destination, 'article/index.html'), 'utf8'), `${name} article`);
+    assert.equal(article.startsWith('A paragraph with a link, bold text, and inline code.'), true, `${name} post keeps its excerpt: ${article}`);
+  }
+  const plain = buildDescription('plain', '"Software engineer"');
+  const hostileHtml = readFileSync(join(plain, 'hostile-description/index.html'), 'utf8');
+  assert.equal(descriptionContent(hostileHtml, 'hostile page'), 'Profile &quot;text &amp; friends', 'Hostile page description is stripped and escaped once');
+  assert.equal(hostileHtml.includes('<b data-metadata>'), false, 'Hostile page description must not create elements');
+  assert.equal(descriptionContent(readFileSync(join(plain, 'index.html'), 'utf8'), 'plain home'), 'Software engineer', 'A nonblank bio remains the home description');
+  assert.equal(descriptionContent(readFileSync(join(plain, 'blank-description/index.html'), 'utf8'), 'blank page description'), 'Software engineer', 'A whitespace page description falls through to the bio');
+  const metadataExplicit = descriptionContent(readFileSync(join(output, 'metadata/explicit-description/index.html'), 'utf8'), 'metadata explicit');
+  assert.equal(metadataExplicit, 'Explicit page description', 'An explicit page description wins over a nonblank bio');
+  console.log('PASS description selection');
   const types = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.ico': 'image/x-icon' };
   // Use HTTPS so WebKit can enforce the production upgrade-insecure-requests CSP.
   const key = join(temporary, 'localhost.key');
