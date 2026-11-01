@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve } from 'node:path';
-import { createServer } from 'node:https';
+import { createServer, get as httpsGet } from 'node:https';
 import { spawnSync } from 'node:child_process';
+import { gzipSync } from 'node:zlib';
 import { chromium, firefox, webkit } from 'playwright';
 import axe from 'axe-core';
 
@@ -42,6 +43,23 @@ const metadataTopic = {
 };
 let server;
 try {
+  const primerLicense = 'Released under MIT license. Copyright (c) 2019 GitHub Inc.';
+  const primerFull = join(root, 'assets/vendor/primer.full.css');
+  const primerServed = readFileSync(join(root, 'assets/vendor/primer.css'));
+  assert.ok(existsSync(primerFull), 'Keep the full Primer original for provenance');
+  const primerOriginal = readFileSync(primerFull);
+  assert.ok(primerOriginal.includes(primerLicense), 'Full Primer keeps its license');
+  assert.ok(primerOriginal.includes('normalize.css v4.1.1'), 'Full Primer keeps the normalize license');
+  assert.ok(primerServed.includes(primerLicense), 'Served Primer keeps the Primer license');
+  assert.ok(primerServed.includes('normalize.css v4.1.1'), 'Served Primer keeps the normalize license');
+  assert.ok(primerServed.length < primerOriginal.length, 'Served Primer is a subset of the original');
+  for (const selector of ['.circle', '.tooltipped', '.container-lg', '.octicon']) {
+    assert.ok(primerServed.includes(selector), `Served Primer keeps ${selector}`);
+  }
+  const primerGzip = gzipSync(primerServed).length;
+  assert.ok(primerGzip < 12000, `Served Primer gzip ${primerGzip} bytes is substantially below 23KB`);
+  const favicon = readFileSync(join(root, 'favicon.ico'));
+  assert.ok(favicon.length < 8192, `favicon.ico is ${favicon.length} bytes; a large icon delays the mobile LCP image`);
   for (const path of ['_config.yml', '_data', '_includes', '_layouts', '_sass', 'assets', 'index.html', 'favicon.ico', 'package.json']) {
     cpSync(join(root, path), join(source, path), { recursive: true });
   }
@@ -105,7 +123,75 @@ try {
   const metadataExplicit = descriptionContent(readFileSync(join(output, 'metadata/explicit-description/index.html'), 'utf8'), 'metadata explicit');
   assert.equal(metadataExplicit, 'Explicit page description', 'An explicit page description wins over a nonblank bio');
   console.log('PASS description selection');
-  const types = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.ico': 'image/x-icon' };
+  function avatarTag(html) {
+    const match = html.match(/<img[^>]*class="circle"[^>]*>/);
+    assert.ok(match, 'profile portrait img');
+    return match[0];
+  }
+  function avatarAttr(tag, name) {
+    const match = tag.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`));
+    return match ? match[1] : null;
+  }
+  function jpegSize(bytes) {
+    assert.equal(bytes[0], 0xff, 'portrait is a JPEG');
+    assert.equal(bytes[1], 0xd8, 'portrait is a JPEG');
+    let offset = 2;
+    while (offset + 9 < bytes.length) {
+      if (bytes[offset] !== 0xff) break;
+      const marker = bytes[offset + 1];
+      if (marker === 0xc0 || marker === 0xc2) {
+        return { height: bytes.readUInt16BE(offset + 5), width: bytes.readUInt16BE(offset + 7) };
+      }
+      if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd9)) {
+        offset += 2;
+        continue;
+      }
+      offset += 2 + bytes.readUInt16BE(offset + 2);
+    }
+    assert.fail('JPEG size missing');
+  }
+  function buildProfile(name, yamlValue) {
+    const config = join(temporary, `profile-${name}.yml`);
+    writeFileSync(config, `${fixture}\nlayout: stacked\nstyle: system\nbaseurl: /profile-${name}\nprofile_image: ${yamlValue}\n`);
+    const destination = join(output, `profile-${name}`);
+    const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', destination, '--config', `${join(source, '_config.yml')},${config}`], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
+    assert.equal(result.status, 0, `Jekyll profile ${name}: ${result.stderr}\n${result.stdout}`);
+    return readFileSync(join(destination, 'index.html'), 'utf8');
+  }
+  const safePortrait = buildProfile('safe', '"/assets/profile/dayan"');
+  const safeTag = avatarTag(safePortrait);
+  const safeSrc = '/profile-safe/assets/profile/dayan-150.jpg';
+  assert.equal(avatarAttr(safeTag, 'src'), safeSrc, 'A safe portrait stem serves the 150px derivative');
+  assert.equal(avatarAttr(safeTag, 'srcset'), `${safeSrc} 150w, /profile-safe/assets/profile/dayan-300.jpg 300w, /profile-safe/assets/profile/dayan-450.jpg 450w`, 'Portrait srcset covers 1x, 2x, and 3x');
+  assert.equal(avatarAttr(safeTag, 'sizes'), '150px', 'The portrait slot is 150 CSS pixels');
+  assert.equal(avatarAttr(safeTag, 'width'), '150');
+  assert.equal(avatarAttr(safeTag, 'height'), '150');
+  assert.equal(avatarAttr(safeTag, 'loading'), 'eager');
+  assert.equal(avatarAttr(safeTag, 'fetchpriority'), 'high');
+  assert.equal(avatarAttr(safeTag, 'alt'), 'Dayan Ruben', 'Portrait alt stays the profile name');
+  assert.equal(avatarAttr(safeTag, 'src'), safePortrait.match(/<meta property="og:image" content="([^"]*)" \/>/)?.[1].replace('http://localhost', ''), 'Open Graph reuses the same-origin 150px portrait');
+  assert.equal(safePortrait.match(/<meta property="og:image" content="([^"]*)" \/>/)?.[1], 'http://localhost/profile-safe/assets/profile/dayan-150.jpg');
+  for (const size of [150, 300, 450]) {
+    const published = readFileSync(join(output, 'profile-safe', 'assets', 'profile', `dayan-${size}.jpg`));
+    assert.deepEqual(jpegSize(published), { width: size, height: size }, `${size}px portrait dimensions`);
+  }
+  for (const [name, yamlValue] of Object.entries({
+    scheme: '"javascript:alert(1)"',
+    https: '"https://evil.example/a.jpg"',
+    protocol: '"//evil.example/a.jpg"',
+    traversal: '"/assets/../secret.jpg"',
+    slash: '"/assets/profile\\\\evil.jpg"',
+    blank: '"   "',
+  })) {
+    const html = buildProfile(name, yamlValue);
+    const tag = avatarTag(html);
+    assert.equal(avatarAttr(tag, 'src'), '/favicon.ico', `${name} profile path keeps the configured avatar`);
+    assert.equal(avatarAttr(tag, 'srcset'), null, `${name} profile path does not advertise derivatives`);
+    assert.equal(html.includes('javascript:'), false, `${name} profile path cannot create a script URL`);
+    assert.equal(html.includes('evil.example'), false, `${name} profile path cannot emit the rejected host`);
+  }
+  console.log('PASS profile portrait');
+  const types = { '.css': 'text/css', '.js': 'text/javascript', '.html': 'text/html', '.ico': 'image/x-icon', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
   // Use HTTPS so WebKit can enforce the production upgrade-insecure-requests CSP.
   const key = join(temporary, 'localhost.key');
   const certificate = join(temporary, 'localhost.crt');
@@ -122,6 +208,13 @@ try {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `https://127.0.0.1:${server.address().port}`;
+  const portraitType = await new Promise((resolvePromise, reject) => {
+    httpsGet(`${origin}/profile-safe/assets/profile/dayan-150.jpg`, { rejectUnauthorized: false }, response => {
+      response.resume();
+      resolvePromise(response.headers['content-type']);
+    }).on('error', reject);
+  });
+  assert.equal(portraitType, 'image/jpeg', 'Local portraits are served as JPEG');
   const expected = { light: 'rgb(255, 255, 255)', dark: 'rgb(13, 17, 23)' };
   async function appearance(page, theme) {
     await page.waitForFunction(value => getComputedStyle(document.body).backgroundColor === value, expected[theme]);

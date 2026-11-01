@@ -1,0 +1,17 @@
+{% assign candidate = site.profile_image | default: '' | strip %}
+{% assign lowered = candidate | downcase %}
+{% assign safe = true %}
+{% if candidate.size < 2 %}
+  {% assign safe = false %}
+{% endif %}
+{% assign first = candidate | slice: 0, 1 %}
+{% assign second = candidate | slice: 1, 1 %}
+{% if first != '/' or second == '/' %}
+  {% assign safe = false %}
+{% endif %}
+{% if lowered contains ':' or candidate contains '..' or candidate contains '\' or candidate contains ' ' or candidate contains '"' or candidate contains "'" or candidate contains '<' or candidate contains '>' %}
+  {% assign safe = false %}
+{% endif %}
+{% if safe %}
+{{ candidate }}
+{% endif %}

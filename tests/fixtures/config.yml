@@ -1,6 +1,8 @@
 repository: dayanruben/dayanruben.com
 url: http://localhost
 baseurl: ""
+# Theme builds keep the escaped GitHub avatar. A later profile_image overrides this.
+profile_image: ""
 title: Theme validation
 description: Local theme validation fixtures
 github:

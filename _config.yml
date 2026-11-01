@@ -3,6 +3,9 @@ style: system
 title: Dayan Ruben
 description: Personal website and portfolio of Dayan Ruben, software engineer.
 url: https://dayanruben.com
+# Site-root portrait stem. Files are stem-150.jpg, stem-300.jpg, and stem-450.jpg.
+# Replace those three files when the GitHub profile photo changes.
+profile_image: /assets/profile/dayan
 
 plugins:
   - jekyll-octicons

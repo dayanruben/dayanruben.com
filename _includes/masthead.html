@@ -4,8 +4,17 @@
   {% assign metadata_styles = 'd-flex flex-items-center mb-3' %}
 {% endif %}
 
+{% capture profile_stem %}{% include profile-stem.html %}{% endcapture %}
+{% assign profile_stem = profile_stem | strip %}
 <div class="profile-avatar">
-  <img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;">
+  {% if profile_stem != blank %}
+    {% assign profile_150 = profile_stem | append: '-150.jpg' | relative_url %}
+    {% assign profile_300 = profile_stem | append: '-300.jpg' | relative_url %}
+    {% assign profile_450 = profile_stem | append: '-450.jpg' | relative_url %}
+    <img src="{{ profile_150 | escape }}" srcset="{{ profile_150 | escape }} 150w, {{ profile_300 | escape }} 300w, {{ profile_450 | escape }} 450w" sizes="150px" width="150" height="150" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;" loading="eager" fetchpriority="high">
+  {% else %}
+    <img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;">
+  {% endif %}
   {% include theme-switcher.html %}
 </div>
 <div class="profile-heading {% if site.layout == 'stacked' %}flex-justify-center{% endif %}">
