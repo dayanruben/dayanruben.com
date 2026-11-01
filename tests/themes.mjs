@@ -204,6 +204,13 @@ try {
         for (const route of ['/', '/preview.html', '/article/']) {
           const response = await page.goto(`${origin}/${layout}${route}`);
           assert.equal(response.status(), 200, `Page ${layout}${route} must exist`);
+          assert.equal(await page.locator('main:visible').count(), 1, `Exactly one visible main landmark: ${layout}${route}`);
+          if (route === '/') {
+            assert.equal(await page.locator('main .profile-avatar').count(), 1, 'Homepage main includes the profile');
+          } else {
+            assert.equal(await page.locator('main .profile-avatar').count(), 0, 'Reading pages keep the profile outside main');
+            assert.ok(await page.locator('main h1, main .article').count() > 0, 'Reading pages put the primary content in main');
+          }
           assert.equal(await page.locator('#theme-toggle').count(), 1, `Theme control missing: ${layout}${route}: ${(await page.locator('body').innerText()).slice(0, 300)}`);
           assert.match(await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /frame-ancestors 'none'/, 'CSP must block framing');
           if (route === '/article/') {
@@ -244,6 +251,8 @@ try {
             await page.evaluate(axe.source);
             const accessibility = await page.evaluate(async () => axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } }));
             assert.deepEqual(accessibility.violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })), [], 'Accessibility violations');
+            const mainLandmark = await page.evaluate(async () => axe.run(document, { runOnly: { type: 'rule', values: ['landmark-one-main'] } }));
+            assert.deepEqual(mainLandmark.violations.map(({ id }) => id), [], `landmark-one-main ${layout}${route}`);
             await page.screenshot({ path: join(artifacts, `${browserName}-${layout}-${route.replaceAll('/', '') || 'home'}-${theme}.png`), fullPage: true });
             reports.push({ browserName, layout, route, theme, textColorsChecked: currentColors.length, icons: icons.length, minimumIconContrast: Math.min(...icons.map(i => i.ratio)), accessibilityViolations: accessibility.violations.length });
           }
@@ -282,6 +291,8 @@ try {
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'No horizontal overflow');
           const violations = await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })).violations);
           assert.deepEqual(violations, [], 'Mobile control accessibility');
+          const mobileLandmark = await page.evaluate(async () => (await axe.run(document, { runOnly: { type: 'rule', values: ['landmark-one-main'] } })).violations.map(({ id }) => id));
+          assert.deepEqual(mobileLandmark, [], 'Mobile landmark-one-main');
           await page.screenshot({ path: join(artifacts, `${browserName}-${layout}-mobile-${theme}.png`), fullPage: true });
           await page.keyboard.press('Escape');
         }

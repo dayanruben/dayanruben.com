@@ -1,7 +1,7 @@
 {% include header.html %}
 
 {% if site.layout == 'stacked' %}
-  <div class="container-lg py-6 p-responsive text-center">
+  <main class="container-lg py-6 p-responsive text-center">
     {% include masthead.html metadata=true %}
 
     <div>
@@ -23,9 +23,9 @@
         {% include thoughts.html %}
       </div>
     {% endunless %}
-  </div>
+  </main>
 {% else %}
-  <div class="d-md-flex min-height-full border-md-bottom">
+  <main class="d-md-flex min-height-full border-md-bottom">
     <div class="flex-self-stretch border-md-right theme-surface col-md-5 col-lg-4 col-xl-3 px-4 px-md-6 px-lg-7 py-6">
       {% include masthead.html metadata=true %}
     </div>
@@ -49,7 +49,7 @@
         {% endunless %}
       </div>
     </div>
-  </div>
+  </main>
 {% endif %}
 
 {% include footer.html %}
