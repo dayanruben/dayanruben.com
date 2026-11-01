@@ -144,7 +144,6 @@ When changing a security contact, domain, profile, or key, update the relevant f
 | [tests/](tests/)                         | Temporary-fixture browser, accessibility, metadata, and theme checks                       |
 | [.github/workflows/](.github/workflows/) | Static validation and GitHub Pages deployment                                              |
 | [AGENTS.md](AGENTS.md)                   | Repository instructions for safe changes and validation                                    |
-| [CLAUDE.md](CLAUDE.md)                   | Symlink to <code>AGENTS.md</code> for compatible coding agents                             |
 
 Generated <code>_site/</code>, browser artifacts, <code>node_modules/</code>, and repository-only documentation are excluded from the public build.
 

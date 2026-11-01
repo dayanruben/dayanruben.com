@@ -79,7 +79,6 @@ exclude:
   - "package.json"
   - "package-lock.json"
   - "AGENTS.md"
-  - "CLAUDE.md"
   - "README.md"
   - "Gemfile"
   - "Gemfile.lock"
