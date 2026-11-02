@@ -207,6 +207,10 @@ try {
     const file = resolve(output, `.${path}`);
     if (!file.startsWith(`${output}/`) || !existsSync(file)) { response.writeHead(404); response.end(); return; }
     response.setHeader('Content-Type', types[extname(file)] || 'application/octet-stream');
+    if (extname(file) === '.html') {
+      response.setHeader('Content-Security-Policy', "frame-ancestors 'none'");
+      response.setHeader('X-Frame-Options', 'DENY');
+    }
     response.end(readFileSync(file));
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -259,6 +263,21 @@ try {
   for (const [browserName, browserType] of Object.entries({ chromium, firefox, webkit })) {
     const browser = await browserType.launch();
     try {
+      // HTTP framing protection must work without the theme script's fallback.
+      const embeddingContext = await browser.newContext({ ignoreHTTPSErrors: true, javaScriptEnabled: false });
+      try {
+        const parent = await embeddingContext.newPage();
+        await parent.setContent(`<iframe src="${origin}/stacked/"></iframe>`);
+        await parent.waitForLoadState('networkidle');
+        const child = parent.frames().find(frame => frame !== parent.mainFrame());
+        assert.ok(child, 'The embedding attempt creates a child browsing context');
+        // A blocked Firefox frame has no document execution context to query.
+        if (browserName === 'firefox') {
+          assert.notEqual(child.url(), `${origin}/stacked/`, 'HTTP headers prevent framing even without JavaScript');
+        } else {
+          assert.equal(await child.locator('main').count(), 0, 'HTTP headers prevent framing even without JavaScript');
+        }
+      } finally { await embeddingContext.close(); }
       // API metadata is plain text even when it contains HTML or attribute quotes.
       const metadataContext = await browser.newContext({ ignoreHTTPSErrors: true });
       try {
@@ -294,9 +313,8 @@ try {
         const context = await browser.newContext({ ignoreHTTPSErrors: true, colorScheme: 'light', viewport: { width: 1280, height: 900 } });
         const page = await context.newPage();
         const errors = [];
-        const expectedBrowserWarnings = [message => message.includes("frame-ancestors") && message.includes('ignored when delivered via')];
         page.on('pageerror', error => errors.push(error.message));
-        page.on('console', message => { if (message.type() === 'error' && !expectedBrowserWarnings.some(isExpected => isExpected(message.text()))) errors.push(message.text()); });
+        page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
         for (const route of ['/', '/preview.html', '/article/']) {
           const response = await page.goto(`${origin}/${layout}${route}`);
           assert.equal(response.status(), 200, `Page ${layout}${route} must exist`);
@@ -308,7 +326,11 @@ try {
             assert.ok(await page.locator('main h1, main .article').count() > 0, 'Reading pages put the primary content in main');
           }
           assert.equal(await page.locator('#theme-toggle').count(), 1, `Theme control missing: ${layout}${route}: ${(await page.locator('body').innerText()).slice(0, 300)}`);
-          assert.match(await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /frame-ancestors 'none'/, 'CSP must block framing');
+          const metaPolicy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+          assert.match(metaPolicy, /script-src 'self'/, 'Keep the restrictive script policy');
+          assert.doesNotMatch(metaPolicy, /frame-ancestors/, 'Framing policy cannot be delivered through meta');
+          assert.match(response.headers()['content-security-policy'] ?? '', /frame-ancestors 'none'/, 'HTTP CSP must block framing');
+          assert.equal(response.headers()['x-frame-options'], 'DENY');
           if (route === '/article/') {
             assert.equal(await page.locator('[data-title]').count(), 0, 'Post titles must remain inert');
           }
