@@ -91,6 +91,8 @@ npm run audit -- --serve "$build_dir" --runs 3 --strict --output lighthouse-repo
 
 Use a fresh output directory for each comparison so low runs remain in the record. CI runs the same strict six-report check and uploads reports even on failure. This is a CI validation, not enforcement of branch protection: direct pushes are still subject to the repository's configured rules. Neither local checks nor CLI audits of the live URL establish Google PageSpeed acceptance; retain three consecutive fresh Google-hosted results per device separately. CrUX field data is another independent assessment.
 
+Production framing headers and hostname-scoped script-injection suppression are documented in [the edge delivery runbook](docs/performance/edge-delivery.md). Verify them separately with `node tests/edge-response.mjs --url https://dayanruben.com/`; a passing local build cannot establish Cloudflare's current configuration.
+
 Run the production build and static checks when changing templates, configuration, styles, workflows, or dependencies:
 
 ```sh

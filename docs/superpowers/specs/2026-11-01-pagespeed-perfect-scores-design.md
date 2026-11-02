@@ -91,3 +91,7 @@ If performance remains below 100 after the specified optimizations, the task rem
 - [Cloudflare Web Analytics setup](https://developers.cloudflare.com/web-analytics/get-started/): site-level automatic-injection controls.
 - [Cloudflare JavaScript Detections](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/javascript-detections/): bot-mode constraints and CSP incompatibility.
 - [Cloudflare response-header transforms](https://developers.cloudflare.com/rules/transform/response-header-modification/): real HTTP framing headers and rule ordering.
+
+## Execution note: hostname-scoped edge control
+
+The deployed edge rules append `no-transform` to the existing Cache-Control header on the canonical hostname. Independent mobile and desktop HTTP checks confirmed that this removes both injected scripts while preserving the origin TTL and gzip compression. Zone-wide Bot Fight Mode, JavaScript-detection settings, the `www` redirect, and the separate camera-log analytics configuration remain unchanged. This replaces the initially proposed global analytics/bot toggles with narrower response control; see [the verified runbook](../../performance/edge-delivery.md).

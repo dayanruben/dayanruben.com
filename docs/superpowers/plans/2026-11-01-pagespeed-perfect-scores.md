@@ -58,7 +58,7 @@ At execution start, inspect status/worktrees/branches again, preserve `.scratch/
 - Consumes: existing meta CSP and fixture HTTPS responses.
 - Produces: unchanged restrictive meta policy except for removal of `frame-ancestors`; fixture HTTP `Content-Security-Policy: frame-ancestors 'none'` and `X-Frame-Options: DENY`. Production headers are supplied by Task 5, not by Jekyll.
 
-- [ ] **Step 1: Add the failing `CSP is effective and console-clean` assertions.** In the route checks, keep the existing meta-policy checks but assert:
+- [x] **Step 1: Add the failing `CSP is effective and console-clean` assertions.** In the route checks, keep the existing meta-policy checks but assert:
 
 ```js
 assert.match(metaPolicy, /script-src 'self'/);
@@ -70,10 +70,10 @@ assert.deepEqual(errors, []);
 
 Remove `expectedBrowserWarnings` and collect all console errors, including security errors. Add a separate JavaScript-disabled embedding check against the fixture: a parent page attempting to frame it must not expose the child `main` content. Keep expected rejection messages confined to that negative-test context.
 
-- [ ] **Step 2: Run `RUBYOPT="-r$PWD/.github/ruby-compat.rb" npm test`.** Expect failure because the current meta directive remains and the fixture response has no framing header.
-- [ ] **Step 3: Correct policy delivery.** Delete only `frame-ancestors 'none';` from the meta CSP. Set the two real headers on fixture HTML responses. Preserve every other directive, the script's position, all escaping, and all theme code.
-- [ ] **Step 4: Run the full three-browser suite.** Expect no ignored CSP errors, real header assertions passing, blocked framing without JavaScript, and existing metadata/Axe/theme checks passing on both layouts and article fixtures.
-- [ ] **Step 5: Commit the two intended paths** with `fix: correct CSP delivery and console checks`. Do not publish before Task 5's production framing headers are verified.
+- [x] **Step 2: Run `RUBYOPT="-r$PWD/.github/ruby-compat.rb" npm test`.** Expect failure because the current meta directive remains and the fixture response has no framing header.
+- [x] **Step 3: Correct policy delivery.** Delete only `frame-ancestors 'none';` from the meta CSP. Set the two real headers on fixture HTML responses. Preserve every other directive, the script's position, all escaping, and all theme code.
+- [x] **Step 4: Run the full three-browser suite.** Expect no ignored CSP errors, real header assertions passing, blocked framing without JavaScript, and existing metadata/Axe/theme checks passing on both layouts and article fixtures.
+- [x] **Step 5: Commit the two intended paths** with `fix: correct CSP delivery and console checks`. Do not publish before Task 5's production framing headers are verified.
 
 ### Task 2: Deliver smaller responsive portraits without losing fallbacks
 
@@ -86,7 +86,7 @@ Remove `expectedBrowserWarnings` and collect all console errors, including secur
 - Consumes: validated `profile_stem`, `relative_url`, and existing JPEG candidates.
 - Produces: `.profile-avatar picture` with `source[type="image/webp"]`, 150/300/450w candidates and `sizes="150px"`; existing `img` remains the JPEG fallback. Open Graph remains JPEG.
 
-- [ ] **Step 1: Extend the existing `safePortrait` assertions with a failing WebP contract.** Require a WebP `<source>` using `/profile-safe/assets/profile/dayan-{150,300,450}.webp`; retain exact JPEG `src`, `srcset`, dimensions, alt text, `loading="eager"`, and `fetchpriority="high"` expectations. Add these byte/signature assertions:
+- [x] **Step 1: Extend the existing `safePortrait` assertions with a failing WebP contract.** Require a WebP `<source>` using `/profile-safe/assets/profile/dayan-{150,300,450}.webp`; retain exact JPEG `src`, `srcset`, dimensions, alt text, `loading="eager"`, and `fetchpriority="high"` expectations. Add these byte/signature assertions:
 
 ```js
 for (const [size, limit] of [[150, 4096], [300, 12288], [450, 24576]]) {
@@ -99,11 +99,11 @@ for (const [size, limit] of [[150, 4096], [300, 12288], [450, 24576]]) {
 
 In fresh browser contexts at DPR 1, 2, and 3, wait for image decode and assert `currentSrc` ends with the corresponding 150/300/450 WebP. Change the source's type to an unsupported MIME type and verify JPEG selection still decodes. Retain hostile-stem/baseurl cases and assert rejected stems emit no WebP candidates.
 
-- [ ] **Step 2: Run the browser suite.** Expect missing WebP files/source assertions to fail.
-- [ ] **Step 3: Generate each derivative** with `cwebp -q 75 -m 6 assets/profile/dayan-<size>.jpg -o assets/profile/dayan-<size>.webp`. Use the official package-manager `webp` tool if absent; add no runtime or Bundler dependency. Inspect the three outputs at displayed size before accepting them.
-- [ ] **Step 4: Add the `<picture>` markup.** Build WebP URLs from the already-validated stem using `relative_url` and `escape`. Keep the JPEG fallback and metadata logic. Change the avatar display selector to cover the nested picture/image so the overlay keeps its geometry; retain theme variables and the 44-pixel control.
-- [ ] **Step 5: Document the exact refresh commands and run the full browser suite.** Expect byte budgets, DPR selection, JPEG fallback, prefixes, unsafe-stem cases, alt text, overlay geometry, and all three engines to pass. Confirm JPEG and WebP MIME types through the fixture server.
-- [ ] **Step 6: Commit only these paths** with `perf: add responsive WebP profile portraits`.
+- [x] **Step 2: Run the browser suite.** Expect missing WebP files/source assertions to fail.
+- [x] **Step 3: Generate each derivative** with `cwebp -q 75 -m 6 assets/profile/dayan-<size>.jpg -o assets/profile/dayan-<size>.webp`. Use the official package-manager `webp` tool if absent; add no runtime or Bundler dependency. Inspect the three outputs at displayed size before accepting them.
+- [x] **Step 4: Add the `<picture>` markup.** Build WebP URLs from the already-validated stem using `relative_url` and `escape`. Keep the JPEG fallback and metadata logic. Change the avatar display selector to cover the nested picture/image so the overlay keeps its geometry; retain theme variables and the 44-pixel control.
+- [x] **Step 5: Document the exact refresh commands and run the full browser suite.** Expect byte budgets, DPR selection, JPEG fallback, prefixes, unsafe-stem cases, alt text, overlay geometry, and all three engines to pass. Confirm JPEG and WebP MIME types through the fixture server.
+- [x] **Step 6: Commit only these paths** with `perf: add responsive WebP profile portraits`.
 
 ### Task 3: Remove both stylesheet round trips at build time
 
@@ -116,15 +116,15 @@ In fresh browser contexts at DPR 1, 2, and 3, wait for image decode and assert `
 - Consumes: compiled Jekyll page output for `/assets/styles.css`, static Primer subset bytes, and the two header links marked `data-site-styles="primer"` / `data-site-styles="theme"`.
 - Produces: Ruby `DayanRuben::InlineStyles.apply(site)` called by `Jekyll::Hooks.register :site, :post_render`; one `<style id="site-styles">` in each rendered HTML page/document, Primer first and theme CSS second. Original CSS files remain generated/available; only their owned link tags are replaced.
 
-- [ ] **Step 1: Add failing `inline CSS preserves complete styling` assertions.** In each rendered HTML fixture, require exactly one `style#site-styles`, no owned external stylesheet links, and the Primer/normalize license notices. Replace the obsolete assertion requiring a timestamped external CSS link. On each homepage require `gzipSync(Buffer.from(rendered)).length <= 14 * 1024`. Preserve the existing Primer subset/provenance tests.
+- [x] **Step 1: Add failing `inline CSS preserves complete styling` assertions.** In each rendered HTML fixture, require exactly one `style#site-styles`, no owned external stylesheet links, and the Primer/normalize license notices. Replace the obsolete assertion requiring a timestamped external CSS link. On each homepage require `gzipSync(Buffer.from(rendered)).length <= 14 * 1024`. Preserve the existing Primer subset/provenance tests.
 
 In browser checks, assert the theme script still has neither `async` nor `defer`, remains before the style, and keeps its same-origin `src`. Add a first-animation-frame check with a saved dark preference and light OS preference: the first visible body background must already be `rgb(13, 17, 23)`. Run the existing no-JavaScript, denied-storage, OS-change, typography, and syntax-highlighting checks unchanged.
 
-- [ ] **Step 2: Run the browser suite.** Expect the single-inline-style assertion to fail against the current two-link output.
-- [ ] **Step 3: Implement `DayanRuben::InlineStyles.apply(site)` in the new plugin.** Use Jekyll's site-level post-render hook so Sass conversion has finished. Process HTML pages and collection documents only; obtain theme CSS from the compiled page, read the canonical Primer subset, and replace exactly the two marked links with one style element. Fail the build on missing CSS, missing/duplicate markers, or CSS containing a closing `</style` token; never silently publish partial styling. Leave feeds, sitemap, and other non-HTML output untouched.
-- [ ] **Step 4: Wire the same plugin into fixture builds and set compressed Sass output.** Add `_plugins` to the fixture source-copy list. Keep all styling sources and color tokens in their existing locations, and keep the early external theme script synchronous.
-- [ ] **Step 5: Run the full browser suite and a production build.** Check homepage compression against the 14-KiB budget, licenses, HTML/feed/sitemap validity, styles in both layouts/articles, and absence of `_plugins` source in output. Run a diagnostic local Lighthouse pair and compare FCP/Speed Index against the retained baseline. Target mobile FCP ≤1,000 ms and Speed Index ≤1,700 ms; keep TBT/CLS at zero. The final strict gate remains decisive.
-- [ ] **Step 6: Commit the intended plugin, template, config, test, and documentation paths** with `perf: inline the small site stylesheet bundle`. If measured results regress, keep the failed reports and revise this task before retaining the optimization.
+- [x] **Step 2: Run the browser suite.** Expect the single-inline-style assertion to fail against the current two-link output.
+- [x] **Step 3: Implement `DayanRuben::InlineStyles.apply(site)` in the new plugin.** Use Jekyll's site-level post-render hook so Sass conversion has finished. Process HTML pages and collection documents only; obtain theme CSS from the compiled page, read the canonical Primer subset, and replace exactly the two marked links with one style element. Fail the build on missing CSS, missing/duplicate markers, or CSS containing a closing `</style` token; never silently publish partial styling. Leave feeds, sitemap, and other non-HTML output untouched.
+- [x] **Step 4: Wire the same plugin into fixture builds and set compressed Sass output.** Add `_plugins` to the fixture source-copy list. Keep all styling sources and color tokens in their existing locations, and keep the early external theme script synchronous.
+- [x] **Step 5: Run the full browser suite and a production build.** Check homepage compression against the 14-KiB budget, licenses, HTML/feed/sitemap validity, styles in both layouts/articles, and absence of `_plugins` source in output. Run a diagnostic local Lighthouse pair and compare FCP/Speed Index against the retained baseline. Target mobile FCP ≤1,000 ms and Speed Index ≤1,700 ms; keep TBT/CLS at zero. The final strict gate remains decisive.
+- [x] **Step 6: Commit the intended plugin, template, config, test, and documentation paths** with `perf: inline the small site stylesheet bundle`. If measured results regress, keep the failed reports and revise this task before retaining the optimization.
 
 ### Task 4: Make all four scores a strict, retained CI contract
 
@@ -136,7 +136,7 @@ In browser checks, assert the theme script still has neither `async` nor `defer`
 - Consumes: existing `planRuns`, `readCategories`, `verdict`, and `npm run audit` CLI.
 - Produces: same interfaces and displayed-score semantics; `readCategories(report)` additionally rejects non-finite/out-of-range scores. CI invokes `npm run audit -- --serve "$RUNNER_TEMP/site" --runs 3 --strict`; all six reports remain artifacts.
 
-- [ ] **Step 1: Extend `lighthouse-contract.mjs` with failing malformed-score/CI expectations.** Add assertions equivalent to:
+- [x] **Step 1: Extend `lighthouse-contract.mjs` with failing malformed-score/CI expectations.** Add assertions equivalent to:
 
 ```js
 for (const score of [NaN, Infinity, -0.01, 1.01]) {
@@ -151,10 +151,10 @@ assert.equal(plan.verdict({ strict: true, planned, reports: reports.slice(0, 5) 
 
 Update the existing workflow-command expectation to the strict command above. Keep tests proving diagnostic mode is not PageSpeed acceptance, one pair cannot satisfy strict mode, every category is required, runs are serial, and reports cannot be under `_site`.
 
-- [ ] **Step 2: Run `node tests/lighthouse-contract.mjs`.** Expect malformed numeric scores or the old diagnostic CI command to fail.
-- [ ] **Step 3: Validate finite scores in `[0, 1]` and enable strict CI.** Preserve Lighthouse-compatible displayed-score rounding and default diagnostic CLI behavior. Keep artifact upload under `if: always()`; retain every low run. Document both command modes and the distinction between local, live CLI, and PageSpeed acceptance.
-- [ ] **Step 4: Run the contract, ESLint, Prettier, actionlint, locked dependency checks, and audit.** Run a production build followed by `npm run audit -- --serve <absolute-build-directory> --runs 3 --strict --output lighthouse-reports/local-<candidate>`. Expect six rows with four 100s each and exit 0. A 99 means this gate is unmet; inspect its weighted metrics instead of lowering or bypassing the check. Verify whether repository branch rules actually require the job before calling it a merge gate.
-- [ ] **Step 5: Commit the intended paths** with `ci: require retained Lighthouse scores of 100`.
+- [x] **Step 2: Run `node tests/lighthouse-contract.mjs`.** Expect malformed numeric scores or the old diagnostic CI command to fail.
+- [x] **Step 3: Validate finite scores in `[0, 1]` and enable strict CI.** Preserve Lighthouse-compatible displayed-score rounding and default diagnostic CLI behavior. Keep artifact upload under `if: always()`; retain every low run. Document both command modes and the distinction between local, live CLI, and PageSpeed acceptance.
+- [x] **Step 4: Run the contract, ESLint, Prettier, actionlint, locked dependency checks, and audit.** Run a production build followed by `npm run audit -- --serve <absolute-build-directory> --runs 3 --strict --output lighthouse-reports/local-<candidate>`. Expect six rows with four 100s each and exit 0. A 99 means this gate is unmet; inspect its weighted metrics instead of lowering or bypassing the check. Verify whether repository branch rules actually require the job before calling it a merge gate.
+- [x] **Step 5: Commit the intended paths** with `ci: require retained Lighthouse scores of 100`.
 
 ### Task 5: Remove the actual Cloudflare causes and verify the edge contract
 
@@ -168,14 +168,14 @@ Update the existing workflow-command expectation to the strict command above. Ke
 - `verifyEdge(url, fetchImpl = fetch) -> Promise<void>`: fetches fresh complete HTML with normal mobile and desktop user agents; applies `assertEdgeResponse` to both.
 - CLI: `node tests/edge-response.mjs --url https://dayanruben.com/`; nonzero for failed fetch/status/header/injection checks. This checks delivery, not category scores.
 
-- [ ] **Step 1: Write failing Node tests for the edge response contract.** Use `node:test` and built-in assertions. Require 200 HTML, HTTP CSP containing `frame-ancestors 'none'`, `X-Frame-Options: DENY`, and absence of both the analytics beacon and injected `/cdn-cgi/challenge-platform/` bootstrap. Assert rejection of each injection, a 403/challenge page, and meta-only framing policy with no HTTP protection. Test both user-agent requests through an injected fake fetch.
-- [ ] **Step 2: Run `node --test tests/edge-response.test.mjs`.** Expect missing-module/function failure.
-- [ ] **Step 3: Implement the two interfaces and CLI using Node built-ins.** Preserve meaningful failure messages and return no successful result for a challenge or missing check. Add the unit command and both files to static CI checks/linting. Do not put provider credentials in fixtures, logs, or the repository.
-- [ ] **Step 4: Inventory effective Cloudflare configuration read-only.** Identify the analytics site, bot mode, injection scope, applicable bot enforcement rules, and existing response-header transforms. Record nonsecret rule IDs, exact hostname scope, current values, and rollback values in the runbook. Use the Cloudflare skill/current provider API contracts at execution time. The selected hostname behavior is authorized for the reviewed implementation; unrelated hostname changes are not.
-- [ ] **Step 5: Remove the two injections within the approved scope.** Set this site's automatic Web Analytics injection to Disable. Turn off JavaScript-detection injection for this hostname through its effective bot configuration, accounting for rules that require detection results so legitimate traffic is not newly challenged. Cloudflare Bot Fight Mode may bundle detection and require a broader mode change: verify scope first. If removing it would affect other hostnames or requires an unapproved security-mode change, stop the provider mutation and present that exact configuration conflict; do not quietly turn off zone-wide protection or broaden CSP.
-- [ ] **Step 6: Deliver real framing headers before the source release.** Create/update the identified rule `dayanruben-com-framing`, expression `(http.host eq "dayanruben.com")`. Add `Content-Security-Policy: frame-ancestors 'none'` as a separate policy so existing HTTP CSPs are preserved; set `X-Frame-Options: DENY`. Read back effective rule ordering and preserve unrelated operations. Record exact rollback instructions.
-- [ ] **Step 7: Run unit tests and live edge verification.** Expect both user agents to pass the script/header contract and normal requests to receive the full page. If stale content is proven, invalidate only the affected URLs, then verify again. The pre-release meta warning is removed by Task 1's eventual deployment; do not call this intermediate state 100 Best Practices.
-- [ ] **Step 8: Commit only the tests, CI edits, and completed nonsecret runbook** with `test: verify production edge delivery`. External state must also be read back; a Git commit alone does not prove it.
+- [x] **Step 1: Write failing Node tests for the edge response contract.** Use `node:test` and built-in assertions. Require 200 HTML, HTTP CSP containing `frame-ancestors 'none'`, `X-Frame-Options: DENY`, and absence of both the analytics beacon and injected `/cdn-cgi/challenge-platform/` bootstrap. Assert rejection of each injection, a 403/challenge page, and meta-only framing policy with no HTTP protection. Test both user-agent requests through an injected fake fetch.
+- [x] **Step 2: Run `node --test tests/edge-response.test.mjs`.** Expect missing-module/function failure.
+- [x] **Step 3: Implement the two interfaces and CLI using Node built-ins.** Preserve meaningful failure messages and return no successful result for a challenge or missing check. Add the unit command and both files to static CI checks/linting. Do not put provider credentials in fixtures, logs, or the repository.
+- [x] **Step 4: Inventory effective Cloudflare configuration read-only.** Identify the analytics site, bot mode, injection scope, applicable bot enforcement rules, and existing response-header transforms. Record nonsecret rule IDs, exact hostname scope, current values, and rollback values in the runbook. Use the Cloudflare skill/current provider API contracts at execution time. The selected hostname behavior is authorized for the reviewed implementation; unrelated hostname changes are not.
+- [x] **Step 5: Remove the two injections within the approved scope.** Set this site's automatic Web Analytics injection to Disable. Turn off JavaScript-detection injection for this hostname through its effective bot configuration, accounting for rules that require detection results so legitimate traffic is not newly challenged. Cloudflare Bot Fight Mode may bundle detection and require a broader mode change: verify scope first. If removing it would affect other hostnames or requires an unapproved security-mode change, stop the provider mutation and present that exact configuration conflict; do not quietly turn off zone-wide protection or broaden CSP.
+- [x] **Step 6: Deliver real framing headers before the source release.** Create/update the identified rule `dayanruben-com-framing`, expression `(http.host eq "dayanruben.com")`. Add `Content-Security-Policy: frame-ancestors 'none'` as a separate policy so existing HTTP CSPs are preserved; set `X-Frame-Options: DENY`. Read back effective rule ordering and preserve unrelated operations. Record exact rollback instructions.
+- [x] **Step 7: Run unit tests and live edge verification.** Expect both user agents to pass the script/header contract and normal requests to receive the full page. If stale content is proven, invalidate only the affected URLs, then verify again. The pre-release meta warning is removed by Task 1's eventual deployment; do not call this intermediate state 100 Best Practices.
+- [x] **Step 8: Commit only the tests, CI edits, and completed nonsecret runbook** with `test: verify production edge delivery`. External state must also be read back; a Git commit alone does not prove it.
 
 ### Task 6: Publish and establish independent PageSpeed acceptance
 
