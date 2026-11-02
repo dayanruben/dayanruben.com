@@ -1,0 +1,1 @@
+now resolve all issues reported by github security scans https://github.com/dayanruben/dayanruben.com/security/code-scanning and https://github.com/dayanruben/dayanruben.com/security/dependabot
