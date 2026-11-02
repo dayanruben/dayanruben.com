@@ -28,8 +28,8 @@ export function readCategories(report) {
   const scores = {};
   for (const id of CATEGORIES) {
     const score = categories[id]?.score;
-    if (typeof score !== 'number') {
-      throw new Error(`Lighthouse report is missing ${id}`);
+    if (!Number.isFinite(score) || score < 0 || score > 1) {
+      throw new Error(`Lighthouse report has a missing or invalid ${id} score`);
     }
     scores[id] = Math.round(score * 100);
   }

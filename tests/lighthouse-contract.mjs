@@ -90,6 +90,13 @@ assert.throws(() => plan.readCategories({
   },
 }), /best-practices/);
 
+for (const score of [NaN, Infinity, -0.01, 1.01]) {
+  assert.throws(() => plan.readCategories({ categories: {
+    performance: { score }, accessibility: { score: 1 },
+    'best-practices': { score: 1 }, seo: { score: 1 },
+  } }), /performance/, 'Malformed category scores must fail even in diagnostic mode');
+}
+
 assert.deepEqual(
   plan.lighthouseInvocation(
     { preset: 'mobile', run: 1, path: 'lighthouse-reports/mobile-1.json' },
@@ -144,7 +151,7 @@ assert.match(checksSection, /\n\s+- run: npm test\n/);
 assert.doesNotMatch(checksSection, /npm run audit|lighthouse-audit/);
 const runLines = [...workflow.matchAll(/^\s*(?:- )?run:\s*(.+)$/gm)].map((match) => match[1].trim());
 const auditRuns = runLines.filter((line) => line.startsWith('npm run audit'));
-assert.deepEqual(auditRuns, ['npm run audit -- --serve "$RUNNER_TEMP/site"']);
+assert.deepEqual(auditRuns, ['npm run audit -- --serve "$RUNNER_TEMP/site" --runs 3 --strict']);
 assert.match(workflow, /node tests\/lighthouse-contract\.mjs/);
 assert.match(
   workflow,

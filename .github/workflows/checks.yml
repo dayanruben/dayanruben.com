@@ -40,7 +40,9 @@ jobs:
       - name: Check Lighthouse audit command
         run: node tests/lighthouse-contract.mjs
       - name: Check Ruby syntax
-        run: ruby -wc .github/ruby-compat.rb
+        run: |
+          ruby -wc .github/ruby-compat.rb
+          ruby -wc _plugins/inline-styles.rb
       - name: Verify locked Ruby dependencies
         run: bundle check
       - name: Audit Node dependencies
@@ -100,7 +102,7 @@ jobs:
           RUBYOPT: -r${{ github.workspace }}/.github/ruby-compat.rb
       - run: npx --no-install playwright install --with-deps chromium
       - name: Audit mobile and desktop
-        run: npm run audit -- --serve "$RUNNER_TEMP/site"
+        run: npm run audit -- --serve "$RUNNER_TEMP/site" --runs 3 --strict
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:

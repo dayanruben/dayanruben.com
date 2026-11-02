@@ -74,6 +74,23 @@ npm test
 
 The suite builds isolated Jekyll fixtures for both layouts and all three theme defaults. It checks theme persistence, system preference changes, keyboard activation, mobile layout, typography, SVG color inheritance, contrast, and Axe violations. Fixtures and screenshots stay outside the published site.
 
+Lighthouse is a separate check. A diagnostic pair retains mobile and desktop results without imposing a score threshold:
+
+```sh
+npm run audit -- --url https://dayanruben.com/ --output lighthouse-reports/diagnostic
+```
+
+The strict mode requires every retained run on both presets to display 100 in Performance, Accessibility, Best Practices, and SEO, with at least three runs per preset:
+
+```sh
+node tests/lighthouse-contract.mjs
+build_dir="$(mktemp -d)"
+JEKYLL_ENV=production PAGES_REPO_NWO=dayanruben/dayanruben.com RUBYOPT="-r$PWD/.github/ruby-compat.rb" bundle exec jekyll build --destination "$build_dir"
+npm run audit -- --serve "$build_dir" --runs 3 --strict --output lighthouse-reports/local
+```
+
+Use a fresh output directory for each comparison so low runs remain in the record. CI runs the same strict six-report check and uploads reports even on failure. This is a CI validation, not enforcement of branch protection: direct pushes are still subject to the repository's configured rules. Neither local checks nor CLI audits of the live URL establish Google PageSpeed acceptance; retain three consecutive fresh Google-hosted results per device separately. CrUX field data is another independent assessment.
+
 Run the production build and static checks when changing templates, configuration, styles, workflows, or dependencies:
 
 ```sh
