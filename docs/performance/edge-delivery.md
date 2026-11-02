@@ -40,7 +40,7 @@ node tests/edge-response.mjs --url https://dayanruben.com/
 npm run audit -- --url https://dayanruben.com/ --runs 3 --strict --output lighthouse-reports/live-<release-sha>
 ```
 
-The edge command requests complete HTML with normal mobile and desktop user agents. It fails for missing HTTP framing protection, challenge/non-200 pages, incomplete HTML, or either injected script. It establishes edge delivery, not Google PageSpeed acceptance. Keep all Lighthouse results and independently collect the Google-hosted acceptance series described in the implementation plan.
+The edge command requests HTML with normal mobile and desktop user agents. Its structural smoke check requires a completed document, the homepage profile, and the theme control; it fails for missing HTTP framing protection, challenge/non-200 pages, truncated HTML, or either injected script. This is not a full visual/content comparison or Google PageSpeed acceptance. Verify the published artifact separately, retain all Lighthouse results, and collect the Google-hosted acceptance series described in the implementation plan.
 
 Use the Cloudflare plugin to read the current entry point and bot/analytics configuration before a change. The existing Wrangler OAuth login can read the zone but returns 403 for these configuration APIs; do not replace credentials, expose tokens, or create a Worker as an authentication workaround.
 

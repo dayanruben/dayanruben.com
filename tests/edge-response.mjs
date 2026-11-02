@@ -5,7 +5,12 @@ import { pathToFileURL } from 'node:url';
 export function assertEdgeResponse({ status, headers, html }) {
   assert.equal(status, 200, 'Production HTML must return HTTP 200');
   assert.match(headers.get('content-type') ?? '', /^text\/html(?:\s*;|$)/i, 'Response must be HTML');
-  assert.match(html, /<main(?:\s|>)/i, 'Response must contain the complete main content');
+  assert.match(html, /^\s*<!doctype\s+html\s*>/i, 'Response must contain a complete HTML document');
+  assert.match(html, /<\/body\s*>\s*<\/html\s*>\s*$/i, 'Response must contain a complete HTML document');
+  const main = html.match(/<main\b[^>]*>[\s\S]*?<\/main\s*>/i)?.[0] ?? '';
+  assert.ok(main, 'Response must contain the complete main content');
+  assert.match(main, /\bclass=["'][^"']*\bprofile-avatar\b[^"']*["']/i, 'Homepage profile content is missing');
+  assert.match(main, /<button\b[^>]*\bid=["']theme-toggle["']/i, 'Homepage theme control is missing');
   assert.match(headers.get('content-security-policy') ?? '', /(?:^|[;,])\s*frame-ancestors\s+'none'\s*(?:;|,|$)/i, 'HTTP CSP must enforce framing protection');
   assert.equal((headers.get('x-frame-options') ?? '').toUpperCase(), 'DENY', 'HTTP framing protection must include DENY');
   assert.doesNotMatch(html, /static\.cloudflareinsights\.com\/beacon/i, 'Cloudflare analytics injection remains');
@@ -37,7 +42,7 @@ if (isMain) {
       throw new Error('Usage: node tests/edge-response.mjs --url https://dayanruben.com/');
     }
     await verifyEdge(process.argv[3]);
-    console.log('PASS edge delivery: mobile and desktop HTTP headers, complete HTML, and no injected scripts');
+    console.log('PASS edge delivery: mobile and desktop HTTP headers, homepage structure, and no injected scripts');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

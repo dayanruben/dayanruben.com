@@ -16,7 +16,7 @@ function response(overrides = {}) {
       'content-security-policy': "default-src 'self'; frame-ancestors 'none'",
       'x-frame-options': 'DENY',
     }),
-    html: '<!doctype html><html lang="en"><head><title>Dayan Ruben</title></head><body><main>Dayan Ruben</main></body></html>',
+    html: '<!doctype html><html lang="en"><head><title>Dayan Ruben</title></head><body><main><div class="profile-avatar"><img src="/assets/profile/dayan-150.jpg" alt="Dayan Ruben"><button id="theme-toggle" type="button">Switch theme</button></div><h1>Dayan Ruben</h1></main></body></html>',
     ...overrides,
   };
 }
@@ -45,6 +45,23 @@ test('rejects non-200 and challenge responses', () => {
 test('rejects a non-HTML or empty response', () => {
   assert.throws(() => edge.assertEdgeResponse(response({ headers: new Headers({ 'content-type': 'application/json' }) })), /HTML/i);
   assert.throws(() => edge.assertEdgeResponse(response({ html: '' })), /main|complete/i);
+});
+
+test('rejects truncated HTML even when an opening main tag exists', () => {
+  for (const html of ['<main>', response().html.replace('</html>', '')]) {
+    assert.throws(() => edge.assertEdgeResponse(response({ html })), /complete/i);
+  }
+});
+
+test('rejects a complete generic interstitial with an empty main', () => {
+  const html = '<!doctype html><html><head><title>Just a moment</title></head><body><main></main></body></html>';
+  assert.throws(() => edge.assertEdgeResponse(response({ html })), /profile|homepage/i);
+});
+
+test('requires the actual homepage profile and theme control markers', () => {
+  for (const html of [response().html.replace('profile-avatar', 'other'), response().html.replace('theme-toggle', 'other')]) {
+    assert.throws(() => edge.assertEdgeResponse(response({ html })), /profile|theme control/i);
+  }
 });
 
 test('meta-only framing directives cannot satisfy the edge contract', () => {
