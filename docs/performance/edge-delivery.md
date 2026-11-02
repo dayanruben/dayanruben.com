@@ -44,6 +44,8 @@ The edge command requests HTML with normal mobile and desktop user agents. Its s
 
 Use the Cloudflare plugin to read the current entry point and bot/analytics configuration before a change. The existing Wrangler OAuth login can read the zone but returns 403 for these configuration APIs; do not replace credentials, expose tokens, or create a Worker as an authentication workaround.
 
+The zone also has a pre-existing Cloudflare-managed `/.well-known/security.txt` response. Its public contact and expiry differ from the repository copy; a provider readback confirmed this override. It was preserved during this performance change. When comparing the deployed Pages artifact with live endpoints, record that known provider-managed exception rather than overwriting public contact metadata to force byte equality.
+
 ## Rollback
 
 1. Read the current ruleset and preserve any rules added by other work since this task.
