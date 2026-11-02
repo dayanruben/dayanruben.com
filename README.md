@@ -92,6 +92,16 @@ GitHub Actions runs the same static checks and browser suite for pull requests, 
 
 Edit [_config.yml](_config.yml) for the site title, description, layout, default theme, project filtering, interests, and supported social profiles. Keep profile URLs and public contact details current. Social icons and share URLs are defined in [_data/social_media.yml](_data/social_media.yml).
 
+The profile uses local 150-, 300-, and 450-pixel JPEGs with WebP alternatives. When refreshing the portrait, replace all three square JPEGs and generate the matching alternatives with the official `webp` tools:
+
+```sh
+cwebp -q 75 -m 6 assets/profile/dayan-150.jpg -o assets/profile/dayan-150.webp
+cwebp -q 75 -m 6 assets/profile/dayan-300.jpg -o assets/profile/dayan-300.webp
+cwebp -q 75 -m 6 assets/profile/dayan-450.jpg -o assets/profile/dayan-450.webp
+```
+
+Keep `profile_image` as the site-root filename stem. Browsers select a WebP candidate for their pixel density; JPEGs remain the fallback and Open Graph image. Run the browser suite to verify dimensions, file budgets, URL safety, and format fallback after replacement.
+
 ### Writing
 
 Add a Markdown file to [_posts/](_posts/) using <code>YYYY-MM-DD-title.md</code> and Jekyll front matter:

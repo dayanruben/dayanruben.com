@@ -11,7 +11,13 @@
     {% assign profile_150 = profile_stem | append: '-150.jpg' | relative_url %}
     {% assign profile_300 = profile_stem | append: '-300.jpg' | relative_url %}
     {% assign profile_450 = profile_stem | append: '-450.jpg' | relative_url %}
-    <img src="{{ profile_150 | escape }}" srcset="{{ profile_150 | escape }} 150w, {{ profile_300 | escape }} 300w, {{ profile_450 | escape }} 450w" sizes="150px" width="150" height="150" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;" loading="eager" fetchpriority="high">
+    {% assign profile_webp_150 = profile_stem | append: '-150.webp' | relative_url %}
+    {% assign profile_webp_300 = profile_stem | append: '-300.webp' | relative_url %}
+    {% assign profile_webp_450 = profile_stem | append: '-450.webp' | relative_url %}
+    <picture>
+      <source type="image/webp" srcset="{{ profile_webp_150 | escape }} 150w, {{ profile_webp_300 | escape }} 300w, {{ profile_webp_450 | escape }} 450w" sizes="150px">
+      <img src="{{ profile_150 | escape }}" srcset="{{ profile_150 | escape }} 150w, {{ profile_300 | escape }} 300w, {{ profile_450 | escape }} 450w" sizes="150px" width="150" height="150" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;" loading="eager" fetchpriority="high">
+    </picture>
   {% else %}
     <img src="{{ user.avatar_url | escape }}" alt="{{ user.name | escape }}" class="circle" style="width: 150px; height: 150px; max-width: 150px;">
   {% endif %}

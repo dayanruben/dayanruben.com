@@ -97,7 +97,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   margin-bottom: 16px;
   line-height: 0;
 }
-.profile-avatar > img { display: block; }
+.profile-avatar > picture, .profile-avatar img { display: block; }
 .profile-avatar .theme-switcher {
   position: absolute;
   right: -6px;

@@ -174,6 +174,14 @@ try {
   assert.equal(avatarAttr(safeTag, 'alt'), 'Dayan Ruben', 'Portrait alt stays the profile name');
   assert.equal(avatarAttr(safeTag, 'src'), safePortrait.match(/<meta property="og:image" content="([^"]*)" \/>/)?.[1].replace('http://localhost', ''), 'Open Graph reuses the same-origin 150px portrait');
   assert.equal(safePortrait.match(/<meta property="og:image" content="([^"]*)" \/>/)?.[1], 'http://localhost/profile-safe/assets/profile/dayan-150.jpg');
+  assert.match(safePortrait.match(/<source\b[^>]*>/)?.[0] ?? '', /<source\s+type="image\/webp"\s+srcset="\/profile-safe\/assets\/profile\/dayan-150\.webp 150w, \/profile-safe\/assets\/profile\/dayan-300\.webp 300w, \/profile-safe\/assets\/profile\/dayan-450\.webp 450w"\s+sizes="150px"/);
+  for (const [size, limit] of [[150, 4096], [300, 12288], [450, 24576]]) {
+    const image = readFileSync(join(root, 'assets/profile', `dayan-${size}.webp`));
+    assert.ok(image.length <= limit, `${size}px WebP stays within ${limit} bytes`);
+    assert.equal(image.toString('ascii', 0, 4), 'RIFF');
+    assert.equal(image.toString('ascii', 8, 12), 'WEBP');
+    assert.deepEqual(readFileSync(join(output, 'profile-safe/assets/profile', `dayan-${size}.webp`)), image, 'WebP derivative is published intact');
+  }
   for (const size of [150, 300, 450]) {
     const published = readFileSync(join(output, 'profile-safe', 'assets', 'profile', `dayan-${size}.jpg`));
     assert.deepEqual(jpegSize(published), { width: size, height: size }, `${size}px portrait dimensions`);
@@ -190,6 +198,7 @@ try {
     const tag = avatarTag(html);
     assert.equal(avatarAttr(tag, 'src'), '/favicon.ico', `${name} profile path keeps the configured avatar`);
     assert.equal(avatarAttr(tag, 'srcset'), null, `${name} profile path does not advertise derivatives`);
+    assert.doesNotMatch(html, /<source\b/, `${name} profile path must not advertise WebP derivatives`);
     assert.equal(html.includes('javascript:'), false, `${name} profile path cannot create a script URL`);
     assert.equal(html.includes('evil.example'), false, `${name} profile path cannot emit the rejected host`);
   }
@@ -222,6 +231,13 @@ try {
     }).on('error', reject);
   });
   assert.equal(portraitType, 'image/jpeg', 'Local portraits are served as JPEG');
+  const webpType = await new Promise((resolvePromise, reject) => {
+    httpsGet(`${origin}/profile-safe/assets/profile/dayan-150.webp`, { rejectUnauthorized: false }, response => {
+      response.resume();
+      resolvePromise(response.headers['content-type']);
+    }).on('error', reject);
+  });
+  assert.equal(webpType, 'image/webp', 'Modern portraits are served as WebP');
   const expected = { light: 'rgb(255, 255, 255)', dark: 'rgb(13, 17, 23)' };
   async function appearance(page, theme) {
     await page.waitForFunction(value => getComputedStyle(document.body).backgroundColor === value, expected[theme]);
@@ -278,6 +294,20 @@ try {
           assert.equal(await child.locator('main').count(), 0, 'HTTP headers prevent framing even without JavaScript');
         }
       } finally { await embeddingContext.close(); }
+      for (const deviceScaleFactor of [1, 2, 3]) {
+        const portraitContext = await browser.newContext({ ignoreHTTPSErrors: true, deviceScaleFactor, viewport: { width: 412, height: 823 } });
+        try {
+          const page = await portraitContext.newPage();
+          await page.goto(`${origin}/profile-safe/`);
+          const portrait = page.locator('.profile-avatar img');
+          await portrait.evaluate(image => image.decode());
+          assert.equal(await portrait.evaluate(image => image.currentSrc), `${origin}/profile-safe/assets/profile/dayan-${150 * deviceScaleFactor}.webp`, 'Fresh DPR context selects the appropriate modern portrait');
+          await page.locator('.profile-avatar source').evaluate(source => { source.type = 'image/unsupported'; });
+          await page.waitForFunction(() => document.querySelector('.profile-avatar img').currentSrc.endsWith('.jpg'));
+          await portrait.evaluate(image => image.decode());
+          assert.ok(await portrait.evaluate(image => image.complete && image.naturalWidth > 0), 'JPEG fallback decodes when WebP is unsupported');
+        } finally { await portraitContext.close(); }
+      }
       // API metadata is plain text even when it contains HTML or attribute quotes.
       const metadataContext = await browser.newContext({ ignoreHTTPSErrors: true });
       try {
