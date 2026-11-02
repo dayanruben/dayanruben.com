@@ -1,0 +1,11 @@
+$superpowers:writing-plans make a plan for achieving 100% for dayanruben.com in all the metrics for mobile and desktop on https://pagespeed.web.dev/analysis/https-dayanruben-com/1usxpcgrah?form_factor=mobile including performance, accesibility, best practices and seo
+
+---
+
+<send_user_message_question_reply>
+[{"answer":"Remove these injections for this hostname, preserving the strict CSP (simpler; may require changing bot settings).","question":"Cloudflare injects analytics and bot-detection scripts that the site’s strict CSP blocks. Which approach should the plan use?","questionItemId":"[\"request_user_input_async\",\"call_07fde611a7014375a8021c6817d40a3c\",0]"}]
+</send_user_message_question_reply>
+
+---
+
+$superpowers:executing-plans completing all tasks, ensuring to push the changes directly to main branch and make all necessary validations before and after the push, don't create a new worktree
