@@ -238,9 +238,10 @@ try {
   // Use HTTPS so WebKit can enforce the production upgrade-insecure-requests CSP.
   const key = join(temporary, 'localhost.key');
   const certificate = join(temporary, 'localhost.crt');
-  const tls = spawnSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', certificate, '-subj', '/CN=localhost', '-days', '1'], { encoding: 'utf8' });
+  const tls = spawnSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', certificate, '-subj', '/CN=localhost', '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1', '-days', '1'], { encoding: 'utf8' });
   assert.equal(tls.status, 0, 'Generate a temporary local HTTPS certificate');
-  server = createServer({ key: readFileSync(key), cert: readFileSync(certificate) }, (request, response) => {
+  const localCertificate = readFileSync(certificate);
+  server = createServer({ key: readFileSync(key), cert: localCertificate }, (request, response) => {
     let path = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     if (path === '/favicon.ico') path = '/stacked/favicon.ico';
     if (path.endsWith('/')) path += 'index.html';
@@ -255,20 +256,22 @@ try {
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `https://127.0.0.1:${server.address().port}`;
-  const portraitType = await new Promise((resolvePromise, reject) => {
-    httpsGet(`${origin}/profile-safe/assets/profile/dayan-150.jpg`, { rejectUnauthorized: false }, response => {
-      response.resume();
-      resolvePromise(response.headers['content-type']);
-    }).on('error', reject);
-  });
-  assert.equal(portraitType, 'image/jpeg', 'Local portraits are served as JPEG');
-  const webpType = await new Promise((resolvePromise, reject) => {
-    httpsGet(`${origin}/profile-safe/assets/profile/dayan-150.webp`, { rejectUnauthorized: false }, response => {
-      response.resume();
-      resolvePromise(response.headers['content-type']);
-    }).on('error', reject);
-  });
-  assert.equal(webpType, 'image/webp', 'Modern portraits are served as WebP');
+  const tlsClientOptions = { ca: localCertificate };
+  function portraitResponse(extension, options = tlsClientOptions) {
+    return new Promise((resolvePromise, reject) => {
+      httpsGet(`${origin}/profile-safe/assets/profile/dayan-150.${extension}`, options, response => {
+        response.resume();
+        resolvePromise({ type: response.headers['content-type'], authorized: response.socket.authorized });
+      }).on('error', reject);
+    });
+  }
+  for (const extension of ['jpg', 'webp']) {
+    await assert.rejects(portraitResponse(extension, { ...tlsClientOptions, ca: [] }), { code: 'DEPTH_ZERO_SELF_SIGNED_CERT' }, 'Reject an untrusted fixture certificate');
+    await assert.rejects(portraitResponse(extension, { ...tlsClientOptions, servername: 'unrelated.invalid' }), { code: 'ERR_TLS_CERT_ALTNAME_INVALID' }, 'Reject the wrong server identity');
+  }
+  assert.deepEqual(await portraitResponse('jpg'), { type: 'image/jpeg', authorized: true }, 'Local portraits use authenticated HTTPS');
+  assert.deepEqual(await portraitResponse('webp'), { type: 'image/webp', authorized: true }, 'Modern portraits use authenticated HTTPS');
+  console.log('PASS fixture TLS: trusted issuer, matching identity, and rejected untrusted/mismatched certificates');
   const expected = { light: 'rgb(255, 255, 255)', dark: 'rgb(13, 17, 23)' };
   async function appearance(page, theme) {
     await page.waitForFunction(value => getComputedStyle(document.body).backgroundColor === value, expected[theme]);

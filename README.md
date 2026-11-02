@@ -107,6 +107,13 @@ git diff --check
 
 GitHub Actions runs the same static checks and browser suite for pull requests, pushes to `main`, and manual checks. The Checks badge reports the latest run on `main`. The workflow files are also linted with [actionlint](https://github.com/rhysd/actionlint).
 
+The validation toolchain overrides transitive `minimatch` to 11.0.3 and `glob` to
+14.0.3 to address [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)
+and [GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4).
+Keep the overrides until ESLint and Lighthouse's dependency chains all resolve to
+patched versions without them; regenerate the lockfile and run the complete checks
+when changing them.
+
 ## Update the site
 
 ### Profile, projects, interests, and social links
