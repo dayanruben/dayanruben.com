@@ -60,12 +60,14 @@ try {
   assert.ok(primerGzip < 12000, `Served Primer gzip ${primerGzip} bytes is substantially below 23KB`);
   const favicon = readFileSync(join(root, 'favicon.ico'));
   assert.ok(favicon.length < 8192, `favicon.ico is ${favicon.length} bytes; a large icon delays the mobile LCP image`);
-  for (const path of ['_config.yml', '_data', '_includes', '_layouts', '_sass', 'assets', 'index.html', 'favicon.ico', 'package.json']) {
+  for (const path of ['_config.yml', '_data', '_includes', '_layouts', '_plugins', '_sass', 'assets', 'index.html', 'favicon.ico', 'package.json']) {
     cpSync(join(root, path), join(source, path), { recursive: true });
   }
   cpSync(join(root, 'tests/fixtures/preview.html'), join(source, 'preview.html'));
   mkdirSync(join(source, 'tests'));
   writeFileSync(join(source, 'tests/private.txt'), 'Validation fixtures must not be published.');
+  mkdirSync(join(source, 'docs'));
+  writeFileSync(join(source, 'docs/private.md'), 'Repository documentation must not be published.');
   mkdirSync(join(source, 'lighthouse-reports'));
   writeFileSync(join(source, 'lighthouse-reports/mobile-1.json'), '{"retained":true}\n');
   mkdirSync(join(source, '_posts'));
@@ -85,14 +87,43 @@ try {
     const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', source, '--destination', join(output, name), '--config', configs], { timeout: 60000, cwd: source, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
     assert.equal(result.status, 0, `Jekyll ${name}: ${result.stderr}\n${result.stdout}`);
     assert.ok(!existsSync(join(output, name, 'tests')), 'Validation tools must not be published');
+    assert.ok(!existsSync(join(output, name, 'docs')), 'Documentation must not be published');
+    assert.ok(!existsSync(join(output, name, '_plugins')), 'Plugin source must not be published');
     assert.ok(!existsSync(join(output, name, 'lighthouse-reports')), 'Lighthouse reports must not be published');
     assert.ok(!existsSync(join(output, name, 'package.json')), 'Node tooling must not be published');
     const rendered = readFileSync(join(output, name, 'index.html'), 'utf8');
     assert.ok(rendered.includes('theme-toggle'), `Rendered theme control: ${result.stdout} ${result.stderr}`);
     assert.ok(!rendered.includes('theme-options'), 'The compact control must not render a theme menu');
-    assert.match(rendered, /href="[^"]*\/assets\/styles\.css\?v=\d+"/, 'Theme stylesheet URL must change on each build to refresh cached styling');
+    const inlineStyles = [...rendered.matchAll(/<style id="site-styles">([\s\S]*?)<\/style>/g)];
+    assert.equal(inlineStyles.length, 1, 'Exactly one complete inline stylesheet');
+    assert.ok(inlineStyles[0][1].includes(primerLicense), 'Inline CSS retains the Primer license');
+    assert.ok(inlineStyles[0][1].includes('normalize.css v4.1.1'), 'Inline CSS retains the normalize license');
+    assert.doesNotMatch(rendered, /<link\b[^>]*\brel="stylesheet"/, 'Styles do not require a blocking request');
+    assert.ok(gzipSync(Buffer.from(rendered)).length <= 14 * 1024, 'Compressed homepage stays within 14 KiB');
     console.log(`PASS Jekyll build: ${name}`);
   }
+  function expectInlineBuildFailure(name, mutate, expected) {
+    const badSource = join(temporary, `inline-${name}`);
+    cpSync(source, badSource, { recursive: true });
+    mutate(badSource);
+    const result = spawnSync('bundle', ['exec', 'jekyll', 'build', '--source', badSource, '--destination', join(output, `inline-${name}`), '--config', `${join(badSource, '_config.yml')},${join(temporary, 'stacked.yml')}`], { timeout: 60000, cwd: badSource, env: { ...process.env, BUNDLE_GEMFILE: join(root, 'Gemfile'), JEKYLL_NO_BUNDLER_REQUIRE: 'true' }, encoding: 'utf8' });
+    assert.notEqual(result.status, 0, `Invalid ${name} must stop the build`);
+    assert.match(result.stderr + result.stdout, expected, `${name} fails for the intended CSS contract`);
+  }
+  expectInlineBuildFailure('missing-css', bad => rmSync(join(bad, 'assets/styles.scss')), /Missing compiled site stylesheet/);
+  expectInlineBuildFailure('missing-marker', bad => {
+    const header = join(bad, '_includes/header.html');
+    writeFileSync(header, readFileSync(header, 'utf8').replace('data-site-styles="theme"', ''));
+  }, /Expected exactly one theme stylesheet link/);
+  expectInlineBuildFailure('duplicate-marker', bad => {
+    const header = join(bad, '_includes/header.html');
+    writeFileSync(header, readFileSync(header, 'utf8').replace('</head>', '<link data-site-styles="primer" href="/duplicate.css" rel="stylesheet"></head>'));
+  }, /Expected exactly one primer stylesheet link/);
+  expectInlineBuildFailure('closing-style', bad => {
+    const primer = join(bad, 'assets/vendor/primer.css');
+    writeFileSync(primer, readFileSync(primer, 'utf8') + '\n/*! </style> */\n');
+  }, /CSS contains a closing style tag/);
+  console.log('PASS inline CSS and fail-closed builds');
   function descriptionContent(html, label) {
     const name = html.match(/<meta name="description" content="([^"]*)" \/>/);
     const openGraph = html.match(/<meta property="og:description" content="([^"]*)" \/>/);
@@ -361,6 +392,10 @@ try {
           assert.doesNotMatch(metaPolicy, /frame-ancestors/, 'Framing policy cannot be delivered through meta');
           assert.match(response.headers()['content-security-policy'] ?? '', /frame-ancestors 'none'/, 'HTTP CSP must block framing');
           assert.equal(response.headers()['x-frame-options'], 'DENY');
+          const themeScript = page.locator('script[src$="/assets/theme.js"]');
+          assert.equal(await themeScript.getAttribute('async'), null, 'Early theme initialization stays synchronous');
+          assert.equal(await themeScript.getAttribute('defer'), null, 'Early theme initialization is not deferred');
+          assert.equal(await themeScript.evaluate(script => Boolean(script.compareDocumentPosition(document.getElementById('site-styles')) & Node.DOCUMENT_POSITION_FOLLOWING)), true, 'Theme initialization precedes inline CSS');
           if (route === '/article/') {
             assert.equal(await page.locator('[data-title]').count(), 0, 'Post titles must remain inert');
           }

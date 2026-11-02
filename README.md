@@ -62,6 +62,8 @@ RUBYOPT="-r$PWD/.github/ruby-compat.rb" bundle exec jekyll serve
 
 Open [http://127.0.0.1:4000](http://127.0.0.1:4000). The compatibility shim keeps the GitHub Pages dependency set working with current Ruby standard-library packaging; omit <code>RUBYOPT</code> only when your local toolchain does not need it.
 
+The Jekyll post-render hook in `_plugins/inline-styles.rb` combines the canonical Primer subset with the compiled, compressed Sass and inlines that small bundle into each HTML page. The same hook runs locally, in fixture tests, and in the Pages build. Keep styling changes in `assets/styles.scss` and the vendored Primer source; do not edit generated inline CSS. The original CSS assets remain available, and their license notices are retained in the inline bundle. The early same-origin theme script stays synchronous to restore preferences before the first paint.
+
 ## Validate changes
 
 Run the browser and accessibility suite before pushing:
@@ -147,6 +149,7 @@ When changing a security contact, domain, profile, or key, update the relevant f
 | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
 | [_config.yml](_config.yml)               | Jekyll settings, site metadata, projects, social profiles, plugins, and publish exclusions |
 | [_layouts/](_layouts/)                   | Page and post shells                                                                       |
+| [_plugins/](_plugins/)                   | Build-time CSS delivery; source is not published                                            |
 | [_includes/](_includes/)                 | Shared Liquid components such as the header, masthead, cards, and footer                   |
 | [_posts/](_posts/)                       | Dated Markdown articles                                                                    |
 | [assets/](assets/)                       | Sass, JavaScript, and vendored Primer CSS                                                  |

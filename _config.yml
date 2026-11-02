@@ -7,6 +7,9 @@ url: https://dayanruben.com
 # Replace those three files when the GitHub profile photo changes.
 profile_image: /assets/profile/dayan
 
+sass:
+  style: compressed
+
 plugins:
   - jekyll-octicons
   - jekyll-github-metadata
@@ -72,6 +75,7 @@ include: [".well-known"]
 
 # Local/CI validation tools and repository-only guidance are not published by GitHub Pages.
 exclude:
+  - "docs"
   - "tests"
   - "lighthouse-reports"
   - "node_modules"
