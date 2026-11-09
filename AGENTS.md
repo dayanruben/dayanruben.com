@@ -22,15 +22,15 @@ Run commands from the repository root. Install dependencies with `bundle install
 |---|---|
 | `npm test` | Build isolated Jekyll fixtures and test Chromium, Firefox, and WebKit, including accessibility and theme persistence. |
 | `bundle exec jekyll build` | Build the production site locally. Use `RUBYOPT="-r$PWD/.github/ruby-compat.rb"` when the compatibility shim is needed. |
-| `npx --no-install eslint assets/theme.js tests/themes.mjs` | Lint JavaScript. |
+| `npx --no-install eslint assets/theme.js tests/themes.mjs tests/lighthouse-contract.mjs tests/lighthouse-plan.mjs tests/lighthouse-audit.mjs tests/edge-response.mjs tests/edge-response.test.mjs` | Lint JavaScript. |
 | `npx --no-install prettier --check .github/workflows/*.yml package.json package-lock.json eslint.config.mjs` | Check formatting for workflow and tooling files. |
-| `ruby -wc .github/ruby-compat.rb` | Check the Ruby compatibility shim. |
+| `ruby -wc .github/ruby-compat.rb` and `ruby -wc _plugins/inline-styles.rb` | Check the Ruby compatibility shim and the Jekyll plugin. |
 | `bundle check` | Confirm the locked Ruby dependencies are installed. |
 | `npm audit --audit-level=high` | Audit Node dependencies for high-severity issues. |
 | `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7` | Lint GitHub Actions workflow syntax. |
 | `npx playwright install chromium firefox webkit` | Install local browser binaries when needed by `npm test`. |
 
-The CI `checks.yml` workflow runs the same static checks and browser suite. The `deploy.yml` workflow builds and deploys only from `main`.
+The CI `checks.yml` workflow runs these static checks and the browser suite, plus the Lighthouse command contract, the production edge-response unit tests, and a strict Lighthouse audit of the production build. The `deploy.yml` workflow builds and deploys only from `main`.
 
 </important>
 
