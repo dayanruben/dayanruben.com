@@ -1,0 +1,1 @@
+push the fixes directly to the main branch, leaving ci green and cleaning all temporal branches and worktrees
