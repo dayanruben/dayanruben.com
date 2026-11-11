@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.13.2",
+  "checkpoint_id": "01M75MGNVVA86AGG8G1FJB6XS7",
+  "session_id": "01a1caf5-dcd7-7820-8c23-208692214bf8",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-11T15:44:40.853306Z",
+  "branch": "task/ci-network-probe",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".github/workflows/runner-network-probe.yml"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "d4e570067664",
+  "checkpoint_transcript_start": 1062,
+  "transcript_lines_at_start": 1062,
+  "compact_transcript_start": 189,
+  "token_usage": {
+    "input_tokens": 22236,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5067648,
+    "output_tokens": 33407,
+    "api_call_count": 19
+  },
+  "session_token_usage": {
+    "input_tokens": 207421,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24432128,
+    "output_tokens": 110276,
+    "api_call_count": 149
+  },
+  "redaction": {
+    "replacements": 74,
+    "layers": {
+      "betterleaks": 11,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 4,
+      "credentialed_uri": 0,
+      "entropy": 70,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
