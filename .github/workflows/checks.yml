@@ -66,12 +66,12 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      # Avoid the Azure mirror DNS stalls documented in actions/runner-images#14594.
+      # Use Ubuntu-signed HTTPS mirrors with independent DNS.
       - name: Prefer Ubuntu HTTPS mirrors
         run: |
           printf '%s\tpriority:%s\n' \
-            'https://archive.ubuntu.com/ubuntu/' 1 \
-            'https://security.ubuntu.com/ubuntu/' 2 |
+            'https://mirror.math.princeton.edu/pub/ubuntu/' 1 \
+            'https://mirrors.edge.kernel.org/ubuntu/' 2 |
             sudo tee /etc/apt/apt-mirrors.txt > /dev/null
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm test
@@ -109,12 +109,12 @@ jobs:
           PAGES_REPO_NWO: ${{ github.repository }}
           JEKYLL_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUBYOPT: -r${{ github.workspace }}/.github/ruby-compat.rb
-      # Avoid the Azure mirror DNS stalls documented in actions/runner-images#14594.
+      # Use Ubuntu-signed HTTPS mirrors with independent DNS.
       - name: Prefer Ubuntu HTTPS mirrors
         run: |
           printf '%s\tpriority:%s\n' \
-            'https://archive.ubuntu.com/ubuntu/' 1 \
-            'https://security.ubuntu.com/ubuntu/' 2 |
+            'https://mirror.math.princeton.edu/pub/ubuntu/' 1 \
+            'https://mirrors.edge.kernel.org/ubuntu/' 2 |
             sudo tee /etc/apt/apt-mirrors.txt > /dev/null
       - run: npx --no-install playwright install --with-deps chromium
       - name: Audit mobile and desktop
